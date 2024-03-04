@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	for true {
+	for {
 		time.Sleep(2 * time.Second)
 		fmt.Println("Test time")
 	}
