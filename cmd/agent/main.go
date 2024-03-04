@@ -19,7 +19,7 @@ func main() {
 		if pollCount%5 == 0 {
 			for k, v := range gauges {
 				r := bytes.NewReader([]byte(""))
-				_, err := http.Post(
+				resp, err := http.Post(
 					fmt.Sprintf("http://localhost:8080/update/gauge/%s/%f", k, v),
 					"Content-Type: text/plain",
 					r,
@@ -27,6 +27,8 @@ func main() {
 				if err != nil {
 					log.Fatalln(err)
 				}
+
+				defer resp.Body.Close()
 			}
 		}
 
