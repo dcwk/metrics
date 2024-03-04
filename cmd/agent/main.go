@@ -28,7 +28,10 @@ func main() {
 					log.Fatalln(err)
 				}
 
-				defer resp.Body.Close()
+				err = resp.Body.Close()
+				if err != nil {
+					log.Fatalln(err)
+				}
 			}
 		}
 
