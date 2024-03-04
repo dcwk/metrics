@@ -31,7 +31,7 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	stor := storage.NewStorage()
 	err = stor.AddGauge(mn, mv)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
@@ -51,7 +51,7 @@ func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	stor := storage.NewStorage()
 	err = stor.AddCounter(mn, mv)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
