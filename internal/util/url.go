@@ -8,7 +8,7 @@ import (
 func ParamsFromUrl(url string) (metricName string, metricValue string, err error) {
 	parts := strings.Split(url, "/")
 	if len(parts) < 5 {
-		err = errors.New("Unsupported url format")
+		err = errors.New("unsupported url format")
 
 		return
 	}
