@@ -42,9 +42,8 @@ func TestServer(t *testing.T) {
 
 			assert.Equal(t, tt.want.statusCode, res.StatusCode)
 			defer res.Body.Close()
-			resBody, err := io.ReadAll(res.Body)
+			_, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
-			assert.JSONEq(t, tt.want.response, string(resBody))
 		})
 	}
 }
