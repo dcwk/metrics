@@ -33,7 +33,7 @@ func TestServer(t *testing.T) {
 		{
 			name: "Test fail unsupported value",
 			want: want{
-				statusCode:  http.StatusInternalServerError,
+				statusCode:  http.StatusBadRequest,
 				response:    "",
 				contentType: "text/plain ",
 			},
