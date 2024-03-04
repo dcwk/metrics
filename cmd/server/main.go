@@ -24,12 +24,15 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	mn, mv, err := util.ParamsFromURL(r.URL.Path)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-
 		return
 	}
 
 	stor := storage.NewStorage()
-	stor.AddMetric(mn, mv)
+	err = stor.AddGauge(mn, mv)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -46,7 +49,11 @@ func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stor := storage.NewStorage()
-	stor.AddMetric(mn, mv)
+	err = stor.AddCounter(mn, mv)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
