@@ -21,7 +21,7 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
-	mn, mv, err := util.ParamsFromUrl(r.URL.Path)
+	mn, mv, err := util.ParamsFromURL(r.URL.Path)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 
@@ -32,15 +32,13 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	stor.AddMetric(mn, mv)
 
 	w.WriteHeader(http.StatusOK)
-
-	return
 }
 
 func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
-	mn, mv, err := util.ParamsFromUrl(r.URL.Path)
+	mn, mv, err := util.ParamsFromURL(r.URL.Path)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 
@@ -51,6 +49,4 @@ func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	stor.AddMetric(mn, mv)
 
 	w.WriteHeader(http.StatusOK)
-
-	return
 }
