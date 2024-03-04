@@ -22,7 +22,7 @@ func TestParamsFromUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mn, mv, err := ParamsFromUrl(tt.url)
+			mn, mv, err := ParamsFromURL(tt.url)
 			assert.NoError(t, err)
 			assert.Equal(t, mn, tt.metricName)
 			assert.Equal(t, mv, tt.metricValue)
