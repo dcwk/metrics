@@ -62,5 +62,5 @@ func UnknownHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
-	w.WriteHeader(http.StatusOK)
+	http.Error(w, "", http.StatusBadRequest)
 }
