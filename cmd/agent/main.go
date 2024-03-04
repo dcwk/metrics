@@ -14,7 +14,6 @@ func main() {
 
 	for {
 		time.Sleep(2 * time.Second)
-		fmt.Printf("%d interval\r\n", pollCount)
 		gauges := getGauges()
 
 		if pollCount%5 == 0 {
@@ -28,7 +27,6 @@ func main() {
 				if err != nil {
 					log.Fatalln(err)
 				}
-				//fmt.Printf("%s %f \r\n", k, v)
 			}
 		}
 
