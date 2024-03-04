@@ -22,13 +22,22 @@ func TestServer(t *testing.T) {
 		request string
 	}{
 		{
-			name: "Test metrics server",
+			name: "Test can save gauge",
 			want: want{
 				statusCode:  http.StatusOK,
 				response:    "",
-				contentType: "text",
+				contentType: "text/plain",
 			},
 			request: "/update/gauge/someMetric/527",
+		},
+		{
+			name: "Test fail unsupported value",
+			want: want{
+				statusCode:  http.StatusInternalServerError,
+				response:    "",
+				contentType: "text/plain ",
+			},
+			request: "/update/gauge/testCounter/none",
 		},
 	}
 
