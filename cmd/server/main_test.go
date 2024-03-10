@@ -52,8 +52,20 @@ func TestServer(t *testing.T) {
 			http.StatusNotFound,
 		},
 		{
-			"Test can save counter",
+			"Test can save counter1",
 			"/update/counter/someMetric/527",
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter2",
+			"/update/counter/testSetGet247/1965",
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter3",
+			"/update/counter/testSetGet247/977",
 			"",
 			http.StatusOK,
 		},
