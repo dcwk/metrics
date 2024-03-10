@@ -9,50 +9,36 @@ import (
 	"testing"
 )
 
+func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
+	req, err := http.NewRequest(method, ts.URL+path, nil)
+	require.NoError(t, err)
+
+	resp, err := ts.Client().Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	return resp, string(respBody)
+}
+
 func TestServer(t *testing.T) {
-	type want struct {
-		statusCode  int
-		response    string
-		contentType string
-	}
+	ts := httptest.NewServer(Router())
+	defer ts.Close()
 
-	tests := []struct {
-		name    string
-		want    want
-		request string
+	var testTable = []struct {
+		url    string
+		want   string
+		status int
 	}{
-		{
-			name: "Test can save gauge",
-			want: want{
-				statusCode:  http.StatusOK,
-				response:    "",
-				contentType: "text/plain",
-			},
-			request: "/update/gauge/someMetric/527",
-		},
-		{
-			name: "Test fail unsupported value",
-			want: want{
-				statusCode:  http.StatusBadRequest,
-				response:    "",
-				contentType: "text/plain ",
-			},
-			request: "/update/gauge/testCounter/none",
-		},
+		{"/update/gauge/someMetric/527", "", http.StatusOK},
+		{"/update/gauge/testCounter/none", "", http.StatusBadRequest},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			request := httptest.NewRequest(http.MethodPost, tt.request, nil)
-			w := httptest.NewRecorder()
-			GaugeHandler(w, request)
-
-			res := w.Result()
-
-			assert.Equal(t, tt.want.statusCode, res.StatusCode)
-			defer res.Body.Close()
-			_, err := io.ReadAll(res.Body)
-			require.NoError(t, err)
-		})
+	for _, tt := range testTable {
+		resp, data := testRequest(t, ts, "POST", tt.url)
+		assert.Equal(t, tt.status, resp.StatusCode)
+		assert.Equal(t, tt.want, data)
 	}
 }

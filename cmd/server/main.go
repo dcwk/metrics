@@ -9,9 +9,9 @@ import (
 func Router() chi.Router {
 	r := chi.NewRouter()
 	r.Route("/update/", func(r chi.Router) {
-		r.Post("/update/gauge/{name}/{value}", GaugeHandler)
-		r.Post("/update/counter/{name}/{value}", CounterHandler)
-		r.Post("/update/", UnknownHandler)
+		r.Post("/gauge/{name}/{value}", GaugeHandler)
+		r.Post("/counter/{name}/{value}", CounterHandler)
+		r.Post("/", UnknownHandler)
 	})
 
 	return r
