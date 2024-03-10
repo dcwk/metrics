@@ -86,7 +86,7 @@ func (ms *MemStorage) AddCounter(name string, value string) error {
 		return errors.New("unsupported counter value")
 	}
 
-	ms.counter[name] = convertedVal
+	ms.counter[name] += convertedVal
 
 	return nil
 }
