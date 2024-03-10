@@ -22,22 +22,20 @@ func main() {
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", getAllHandler)
-
-	r.Route("/update/", func(r chi.Router) {
-		r.Post("/gauge/{name}/{value}", updateGaugeHandler)
-		r.Post("/counter/{name}/{value}", updateCounterHandler)
-		r.Post("/unknown/*", updateUnknownHandler)
-	})
+	r.Get("/", getAllMetricsHandler)
 
 	r.Route("/value/", func(r chi.Router) {
-		r.Get("/{type}/{name}", getDataHandler)
+		r.Get("/{type}/{name}", getMetricHandler)
+	})
+
+	r.Route("/update/", func(r chi.Router) {
+		r.Post("/{type}/{name}/{value}", updateMetricHandler)
 	})
 
 	return r
 }
 
-func getAllHandler(w http.ResponseWriter, r *http.Request) {
+func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
@@ -58,48 +56,7 @@ func getAllHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(res))
 }
 
-func updateGaugeHandler(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	r.Header.Set("Content-Type", "text/plain")
-
-	mn := chi.URLParam(r, "name")
-	mv := chi.URLParam(r, "value")
-
-	stor := storage.NewStorage()
-	err := stor.AddGauge(mn, mv)
-	if err != nil {
-		http.Error(w, "", http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-func updateCounterHandler(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	r.Header.Set("Content-Type", "text/plain")
-
-	mn := chi.URLParam(r, "name")
-	mv := chi.URLParam(r, "value")
-
-	stor := storage.NewStorage()
-	err := stor.AddCounter(mn, mv)
-	if err != nil {
-		http.Error(w, "", http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-func updateUnknownHandler(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	r.Header.Set("Content-Type", "text/plain")
-
-	http.Error(w, "", http.StatusBadRequest)
-}
-
-func getDataHandler(w http.ResponseWriter, r *http.Request) {
+func getMetricHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
@@ -130,4 +87,32 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(v))
+}
+
+func updateMetricHandler(w http.ResponseWriter, r *http.Request) {
+	r.Method = http.MethodPost
+	r.Header.Set("Content-Type", "text/plain")
+
+	t := chi.URLParam(r, "type")
+	mn := chi.URLParam(r, "name")
+	mv := chi.URLParam(r, "value")
+	stor := storage.NewStorage()
+
+	switch t {
+	default:
+		http.Error(w, "", http.StatusBadRequest)
+		return
+	case gauge:
+		if err := stor.AddGauge(mn, mv); err != nil {
+			http.Error(w, "", http.StatusBadRequest)
+			return
+		}
+	case counter:
+		if err := stor.AddCounter(mn, mv); err != nil {
+			http.Error(w, "", http.StatusBadRequest)
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
