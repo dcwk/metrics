@@ -28,17 +28,38 @@ func TestServer(t *testing.T) {
 	defer ts.Close()
 
 	var testTable = []struct {
+		name   string
 		url    string
 		want   string
 		status int
 	}{
-		{"/update/gauge/someMetric/527", "", http.StatusOK},
-		{"/update/gauge/testCounter/none", "", http.StatusBadRequest},
+		{
+			"Test can save gauge",
+			"/update/gauge/someMetric/527",
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save gauge with none value",
+			"/update/gauge/testCounter/none",
+			"\n",
+			http.StatusBadRequest,
+		},
+		{
+			"Test can post with unknown type",
+			"/update/unknown/testCounter/100",
+			"\n",
+			http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range testTable {
-		resp, data := testRequest(t, ts, "POST", tt.url)
-		assert.Equal(t, tt.status, resp.StatusCode)
-		assert.Equal(t, tt.want, data)
+		t.Run(tt.name, func(t *testing.T) {
+			resp, data := testRequest(t, ts, "POST", tt.url)
+			defer resp.Body.Close()
+
+			assert.Equal(t, tt.status, resp.StatusCode)
+			assert.Equal(t, tt.want, data)
+		})
 	}
 }
