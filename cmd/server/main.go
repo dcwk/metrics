@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"metrics/internal/storage"
@@ -12,9 +13,14 @@ const (
 	counter = "counter"
 )
 
+var flagRunAddr string
+
 func main() {
-	err := http.ListenAndServe("localhost:8080", Router())
-	if err != nil {
+	flag.StringVar(&flagRunAddr, "a", ":8080", "address and port to run server")
+	flag.Parse()
+
+	fmt.Println("Running server on", flagRunAddr)
+	if err := http.ListenAndServe(flagRunAddr, Router()); err != nil {
 		panic(err)
 	}
 }
