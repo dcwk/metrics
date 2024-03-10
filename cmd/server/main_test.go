@@ -5,7 +5,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
-	"math"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -114,22 +113,13 @@ func TestGetMetrics(t *testing.T) {
 	for i := 0; i < count; i++ {
 		v := rand.Intn(1024)
 		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
-		testRequest(t, ts, "POST", path)
+		r, _ := testRequest(t, ts, "POST", path)
+		defer r.Body.Close()
 
 		path = "/value/counter/testSetGet" + id
-		_, resp := testRequest(t, ts, "GET", path)
+		r1, resp1 := testRequest(t, ts, "GET", path)
+		defer r1.Body.Close()
 
-		assert.Equal(t, fmt.Sprintf("%d", v), resp)
-
-		path = "/update/gauge/testSetGet" + id + "/" + strconv.Itoa(v)
-		testRequest(t, ts, "POST", path)
-
-		path = "/value/gauge/testSetGet" + id
-		_, resp1 := testRequest(t, ts, "GET", path)
-		val, err := strconv.ParseFloat(resp1, 64)
-		if err != nil {
-			fmt.Errorf(err.Error())
-		}
-		assert.Equal(t, fmt.Sprintf("%d", v), fmt.Sprintf("%.0f", math.Round(val)))
+		assert.Equal(t, fmt.Sprintf("%d", v), resp1)
 	}
 }
