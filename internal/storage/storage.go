@@ -7,7 +7,10 @@ import (
 	"sync"
 )
 
-var stor *MemStorage
+var (
+	once    sync.Once
+	storage *MemStorage
+)
 
 type Storage interface {
 	AddGauge(name string, value float64)
@@ -25,20 +28,21 @@ type Counter struct {
 	counterMx sync.RWMutex
 	counter   map[string]int64
 }
+
 type MemStorage struct {
 	Gauge
 	Counter
 }
 
-func NewStorage() *MemStorage {
-	if stor == nil {
-		stor = &MemStorage{
+func GetStorage() *MemStorage {
+	once.Do(func() {
+		storage = &MemStorage{
 			Gauge{gauge: make(map[string]float64, 1000)},
 			Counter{counter: make(map[string]int64, 1000)},
 		}
-	}
+	})
 
-	return stor
+	return storage
 }
 
 func (ms *MemStorage) AddGauge(name string, value string) error {
