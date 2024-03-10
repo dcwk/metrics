@@ -46,6 +46,30 @@ func TestServer(t *testing.T) {
 			http.StatusBadRequest,
 		},
 		{
+			"Test can save gauge without params",
+			"/update/gauge/",
+			"404 page not found\n",
+			http.StatusNotFound,
+		},
+		{
+			"Test can save counter",
+			"/update/counter/someMetric/527",
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter with none value",
+			"/update/counter/testCounter/none",
+			"\n",
+			http.StatusBadRequest,
+		},
+		{
+			"Test can save counter without params",
+			"/update/counter/",
+			"404 page not found\n",
+			http.StatusNotFound,
+		},
+		{
 			"Test can post with unknown type",
 			"/update/unknown/testCounter/100",
 			"\n",

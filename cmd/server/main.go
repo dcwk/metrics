@@ -11,7 +11,7 @@ func Router() chi.Router {
 	r.Route("/update/", func(r chi.Router) {
 		r.Post("/gauge/{name}/{value}", GaugeHandler)
 		r.Post("/counter/{name}/{value}", CounterHandler)
-		r.Post("/*", UnknownHandler)
+		r.Post("/unknown/*", UnknownHandler)
 	})
 
 	return r
