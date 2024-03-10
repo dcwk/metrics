@@ -23,7 +23,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.
 	return resp, string(respBody)
 }
 
-func TestServer(t *testing.T) {
+func TestUpdateMetrics(t *testing.T) {
 	ts := httptest.NewServer(Router())
 	defer ts.Close()
 
