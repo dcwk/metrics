@@ -62,7 +62,7 @@ func TestCounter(t *testing.T) {
 		{
 			name: "Test can save counter",
 			data: map[string]string{"test": "10"},
-			want: map[string]int64{"test": 10},
+			want: map[string]int64{"test": 20},
 			err:  "",
 		},
 	}
