@@ -6,20 +6,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
+	"strconv"
 	"time"
 )
 
 var (
 	flagServerAddr string
-	reportInterval int
+	reportInterval int64
 	pollInterval   int64
 )
 
 func main() {
 	parseFlags()
 	fmt.Println("Sending metrics to", flagServerAddr)
-	pollCount := 0
+	var pollCount int64 = 0
 
 	for {
 		time.Sleep(time.Duration(pollInterval) * time.Second)
@@ -85,8 +87,28 @@ func getGauges() map[string]float64 {
 
 func parseFlags() {
 	flag.StringVar(&flagServerAddr, "a", ":8080", "metrics server address")
-	flag.IntVar(&reportInterval, "r", 10, "sending frequency interval")
+	flag.Int64Var(&reportInterval, "r", 10, "sending frequency interval")
 	flag.Int64Var(&pollInterval, "p", 2, "metrics reading frequency")
 
 	flag.Parse()
+
+	if envAddress := os.Getenv("ADDRESS"); envAddress != "" {
+		flagServerAddr = envAddress
+	}
+
+	if envReportInterval := os.Getenv("REPORT_INTERVAL"); envReportInterval != "" {
+		interval, err := strconv.ParseInt(envReportInterval, 10, 64)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		reportInterval = interval
+	}
+
+	if envPollInterval := os.Getenv("POLL_INTERVAL"); envPollInterval != "" {
+		interval, err := strconv.ParseInt(envPollInterval, 10, 64)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		pollInterval = interval
+	}
 }
