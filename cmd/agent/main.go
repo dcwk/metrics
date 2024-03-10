@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,18 +10,26 @@ import (
 	"time"
 )
 
+var (
+	flagServerAddr string
+	reportInterval int
+	pollInterval   int64
+)
+
 func main() {
+	parseFlags()
+	fmt.Println("Sending metrics to", flagServerAddr)
 	pollCount := 0
 
 	for {
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Duration(pollInterval) * time.Second)
 		gauges := getGauges()
 
-		if pollCount%5 == 0 {
+		if pollCount%reportInterval == 0 {
 			for k, v := range gauges {
 				r := bytes.NewReader([]byte(""))
 				resp, err := http.Post(
-					fmt.Sprintf("http://localhost:8080/update/gauge/%s/%f", k, v),
+					fmt.Sprintf("http://%s/update/gauge/%s/%f", flagServerAddr, k, v),
 					"Content-Type: text/plain",
 					r,
 				)
@@ -72,4 +81,12 @@ func getGauges() map[string]float64 {
 	gauges["TotalAlloc"] = float64(ms.TotalAlloc)
 
 	return gauges
+}
+
+func parseFlags() {
+	flag.StringVar(&flagServerAddr, "a", ":8080", "metrics server address")
+	flag.IntVar(&reportInterval, "r", 10, "sending frequency interval")
+	flag.Int64Var(&pollInterval, "p", 2, "metrics reading frequency")
+
+	flag.Parse()
 }
