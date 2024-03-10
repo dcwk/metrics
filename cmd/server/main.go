@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"metrics/internal/storage"
 	"net/http"
+	"os"
 )
 
 const (
@@ -16,10 +17,9 @@ const (
 var flagRunAddr string
 
 func main() {
-	flag.StringVar(&flagRunAddr, "a", ":8080", "address and port to run server")
-	flag.Parse()
-
+	parseFlags()
 	fmt.Println("Running server on", flagRunAddr)
+
 	if err := http.ListenAndServe(flagRunAddr, Router()); err != nil {
 		panic(err)
 	}
@@ -39,6 +39,15 @@ func Router() chi.Router {
 	})
 
 	return r
+}
+
+func parseFlags() {
+	flag.StringVar(&flagRunAddr, "a", ":8080", "address and port to run server")
+	flag.Parse()
+
+	if envAddress := os.Getenv("ADDRESS"); envAddress != "" {
+		flagRunAddr = envAddress
+	}
 }
 
 func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {

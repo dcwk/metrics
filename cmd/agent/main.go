@@ -21,6 +21,7 @@ var (
 func main() {
 	parseFlags()
 	fmt.Println("Sending metrics to", flagServerAddr)
+
 	var pollCount int64 = 0
 
 	for {
