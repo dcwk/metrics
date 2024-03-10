@@ -13,10 +13,12 @@ var (
 )
 
 type Storage interface {
-	AddGauge(name string, value float64)
-	AddCounter(name string, value int64)
-	GetGauge(name string) (string, error)
-	GetCounter(name string)
+	AddGauge(name string, value string) error
+	GetGauge(name string) (float64, error)
+	GetAllGauges() map[string]float64
+	AddCounter(name string, value string) error
+	GetCounter(name string) (int64, error)
+	GetAllCounters() map[string]int64
 }
 
 type Gauge struct {
