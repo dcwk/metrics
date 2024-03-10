@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
+	"math"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -108,7 +109,7 @@ func TestGetMetrics(t *testing.T) {
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
-	count := 10
+	count := 1000
 
 	for i := 0; i < count; i++ {
 		v := rand.Intn(1024)
@@ -119,5 +120,16 @@ func TestGetMetrics(t *testing.T) {
 		_, resp := testRequest(t, ts, "GET", path)
 
 		assert.Equal(t, fmt.Sprintf("%d", v), resp)
+
+		path = "/update/gauge/testSetGet" + id + "/" + strconv.Itoa(v)
+		testRequest(t, ts, "POST", path)
+
+		path = "/value/gauge/testSetGet" + id
+		_, resp1 := testRequest(t, ts, "GET", path)
+		val, err := strconv.ParseFloat(resp1, 64)
+		if err != nil {
+			fmt.Errorf(err.Error())
+		}
+		assert.Equal(t, fmt.Sprintf("%d", v), fmt.Sprintf("%.0f", math.Round(val)))
 	}
 }

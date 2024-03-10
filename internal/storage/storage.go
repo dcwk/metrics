@@ -33,8 +33,8 @@ type MemStorage struct {
 func NewStorage() *MemStorage {
 	if stor == nil {
 		stor = &MemStorage{
-			Gauge{m: map[string]float64{}},
-			Counter{m: map[string]int64{}},
+			Gauge{m: make(map[string]float64, 1000)},
+			Counter{m: make(map[string]int64, 1000)},
 		}
 	}
 
