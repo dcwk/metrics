@@ -17,12 +17,12 @@ type Storage interface {
 }
 
 type Gauge struct {
-	mx sync.Mutex
+	mx sync.RWMutex
 	m  map[string]float64
 }
 
 type Counter struct {
-	mx sync.Mutex
+	mx sync.RWMutex
 	m  map[string]int64
 }
 type MemStorage struct {
@@ -56,8 +56,8 @@ func (ms *MemStorage) AddGauge(name string, value string) error {
 }
 
 func (ms *MemStorage) GetGauge(name string) (float64, error) {
-	ms.Gauge.mx.Lock()
-	defer ms.Gauge.mx.Unlock()
+	ms.Gauge.mx.RLock()
+	defer ms.Gauge.mx.RUnlock()
 
 	if ms.Gauge.m[name] == 0 {
 		return 0, errors.New("gauge not found")
@@ -67,8 +67,8 @@ func (ms *MemStorage) GetGauge(name string) (float64, error) {
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
-	ms.Gauge.mx.Lock()
-	defer ms.Gauge.mx.Unlock()
+	ms.Gauge.mx.RLock()
+	defer ms.Gauge.mx.RUnlock()
 
 	return ms.Gauge.m
 }
@@ -88,8 +88,8 @@ func (ms *MemStorage) AddCounter(name string, value string) error {
 }
 
 func (ms *MemStorage) GetCounter(name string) (int64, error) {
-	ms.Counter.mx.Lock()
-	defer ms.Counter.mx.Unlock()
+	ms.Counter.mx.RLock()
+	defer ms.Counter.mx.RUnlock()
 
 	if ms.Counter.m[name] == 0 {
 		return 0, errors.New("counter not found")
@@ -99,8 +99,8 @@ func (ms *MemStorage) GetCounter(name string) (int64, error) {
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
-	ms.Counter.mx.Lock()
-	defer ms.Counter.mx.Unlock()
+	ms.Counter.mx.RLock()
+	defer ms.Counter.mx.RUnlock()
 
 	return ms.Counter.m
 }
