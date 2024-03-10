@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -97,5 +100,24 @@ func TestUpdateMetrics(t *testing.T) {
 			assert.Equal(t, tt.status, resp.StatusCode)
 			assert.Equal(t, tt.want, data)
 		})
+	}
+}
+
+func TestGetMetrics(t *testing.T) {
+	ts := httptest.NewServer(Router())
+	defer ts.Close()
+	path := ""
+	id := strconv.Itoa(rand.Intn(256))
+	count := 10
+
+	for i := 0; i < count; i++ {
+		v := rand.Intn(1024)
+		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
+		testRequest(t, ts, "POST", path)
+
+		path = "/value/counter/testSetGet" + id
+		_, resp := testRequest(t, ts, "GET", path)
+
+		assert.Equal(t, fmt.Sprintf("%d", v), resp)
 	}
 }
