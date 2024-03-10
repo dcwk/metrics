@@ -54,9 +54,9 @@ func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
-	stor := storage.GetStorage()
-	gauges := stor.GetAllGauges()
-	counters := stor.GetAllCounters()
+	s := storage.GetStorage()
+	gauges := s.GetAllGauges()
+	counters := s.GetAllCounters()
 	res := ""
 
 	for n, v := range gauges {
@@ -68,7 +68,10 @@ func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(res))
+	if _, err := w.Write([]byte(res)); err != nil {
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
 }
 
 func getMetricHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +104,10 @@ func getMetricHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(v))
+	if _, err := w.Write([]byte(v)); err != nil {
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
 }
 
 func updateMetricHandler(w http.ResponseWriter, r *http.Request) {
@@ -111,19 +117,19 @@ func updateMetricHandler(w http.ResponseWriter, r *http.Request) {
 	t := chi.URLParam(r, "type")
 	mn := chi.URLParam(r, "name")
 	mv := chi.URLParam(r, "value")
-	stor := storage.GetStorage()
+	s := storage.GetStorage()
 
 	switch t {
 	default:
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	case gauge:
-		if err := stor.AddGauge(mn, mv); err != nil {
+		if err := s.AddGauge(mn, mv); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}
 	case counter:
-		if err := stor.AddCounter(mn, mv); err != nil {
+		if err := s.AddCounter(mn, mv); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}
