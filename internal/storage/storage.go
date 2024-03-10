@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var stor *MemStorage
+
 type Storage interface {
 	AddGauge(name string, value float64)
 	AddCounter(name string, value int64)
@@ -18,11 +20,15 @@ type MemStorage struct {
 	counter map[string]int64
 }
 
-func NewStorage() MemStorage {
-	return MemStorage{
-		gauge:   map[string]float64{},
-		counter: map[string]int64{},
+func NewStorage() *MemStorage {
+	if stor == nil {
+		stor = &MemStorage{
+			gauge:   map[string]float64{},
+			counter: map[string]int64{},
+		}
 	}
+
+	return stor
 }
 
 func (ms *MemStorage) AddGauge(name string, value string) error {
