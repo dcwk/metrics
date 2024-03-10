@@ -1,18 +1,24 @@
 package main
 
 import (
+	"github.com/go-chi/chi/v5"
 	"metrics/internal/storage"
-	"metrics/internal/util"
 	"net/http"
 )
 
-func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/update/gauge/", GaugeHandler)
-	mux.HandleFunc("/update/counter/", CounterHandler)
-	mux.HandleFunc("/update/unknown/", UnknownHandler)
+func Router() chi.Router {
+	r := chi.NewRouter()
+	r.Route("/update/", func(r chi.Router) {
+		r.Post("/update/gauge/{name}/{value}", GaugeHandler)
+		r.Post("/update/counter/{name}/{value}", CounterHandler)
+		r.Post("/update/", UnknownHandler)
+	})
 
-	err := http.ListenAndServe("localhost:8080", mux)
+	return r
+}
+
+func main() {
+	err := http.ListenAndServe("localhost:8080", Router())
 	if err != nil {
 		panic(err)
 	}
@@ -22,14 +28,11 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
-	mn, mv, err := util.ParamsFromURL(r.URL.Path)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	mn := chi.URLParam(r, "name")
+	mv := chi.URLParam(r, "value")
 
 	stor := storage.NewStorage()
-	err = stor.AddGauge(mn, mv)
+	err := stor.AddGauge(mn, mv)
 	if err != nil {
 		http.Error(w, "", http.StatusBadRequest)
 		return
@@ -42,14 +45,11 @@ func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
-	mn, mv, err := util.ParamsFromURL(r.URL.Path)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	mn := chi.URLParam(r, "name")
+	mv := chi.URLParam(r, "value")
 
 	stor := storage.NewStorage()
-	err = stor.AddCounter(mn, mv)
+	err := stor.AddCounter(mn, mv)
 	if err != nil {
 		http.Error(w, "", http.StatusBadRequest)
 		return
