@@ -1,17 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"metrics/internal/storage"
 	"net/http"
 )
 
+const (
+	gauge   = "gauge"
+	counter = "counter"
+)
+
 func Router() chi.Router {
 	r := chi.NewRouter()
 	r.Route("/update/", func(r chi.Router) {
-		r.Post("/gauge/{name}/{value}", GaugeHandler)
-		r.Post("/counter/{name}/{value}", CounterHandler)
-		r.Post("/unknown/*", UnknownHandler)
+		r.Post("/gauge/{name}/{value}", updateGaugeHandler)
+		r.Post("/counter/{name}/{value}", updateCounterHandler)
+		r.Post("/unknown/*", updateUnknownHandler)
+	})
+	r.Route("/value/", func(r chi.Router) {
+		r.Get("/{type}/{name}", getDataHandler)
 	})
 
 	return r
@@ -24,7 +33,7 @@ func main() {
 	}
 }
 
-func GaugeHandler(w http.ResponseWriter, r *http.Request) {
+func updateGaugeHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
@@ -41,7 +50,7 @@ func GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func CounterHandler(w http.ResponseWriter, r *http.Request) {
+func updateCounterHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
@@ -58,9 +67,44 @@ func CounterHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func UnknownHandler(w http.ResponseWriter, r *http.Request) {
+func updateUnknownHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
 	http.Error(w, "", http.StatusBadRequest)
+}
+
+func getDataHandler(w http.ResponseWriter, r *http.Request) {
+	r.Method = http.MethodGet
+	r.Header.Set("Content-Type", "text/plain")
+
+	t := chi.URLParam(r, "type")
+	n := chi.URLParam(r, "name")
+	v := ""
+	s := storage.NewStorage()
+
+	switch t {
+	default:
+		http.Error(w, "", http.StatusBadRequest)
+		return
+	case gauge:
+		metricValue, err := s.GetGauge(n)
+		if err != nil {
+			http.Error(w, "", http.StatusNotFound)
+			return
+		}
+		v = fmt.Sprintf("%f", metricValue)
+		break
+	case counter:
+		metricValue, err := s.GetCounter(n)
+		if err != nil {
+			http.Error(w, "", http.StatusNotFound)
+			return
+		}
+		v = fmt.Sprintf("%d", metricValue)
+		break
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(n + " " + v))
 }
