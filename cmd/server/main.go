@@ -12,13 +12,24 @@ const (
 	counter = "counter"
 )
 
+func main() {
+	err := http.ListenAndServe("localhost:8080", Router())
+	if err != nil {
+		panic(err)
+	}
+}
+
 func Router() chi.Router {
 	r := chi.NewRouter()
+
+	r.Get("/", getAllHandler)
+
 	r.Route("/update/", func(r chi.Router) {
 		r.Post("/gauge/{name}/{value}", updateGaugeHandler)
 		r.Post("/counter/{name}/{value}", updateCounterHandler)
 		r.Post("/unknown/*", updateUnknownHandler)
 	})
+
 	r.Route("/value/", func(r chi.Router) {
 		r.Get("/{type}/{name}", getDataHandler)
 	})
@@ -26,11 +37,25 @@ func Router() chi.Router {
 	return r
 }
 
-func main() {
-	err := http.ListenAndServe("localhost:8080", Router())
-	if err != nil {
-		panic(err)
+func getAllHandler(w http.ResponseWriter, r *http.Request) {
+	r.Method = http.MethodGet
+	r.Header.Set("Content-Type", "text/plain")
+
+	stor := storage.NewStorage()
+	gauges := stor.GetAllGauges()
+	counters := stor.GetAllCounters()
+	res := ""
+
+	for n, v := range gauges {
+		res += n + " " + fmt.Sprintf("%.3f", v) + "\n\r"
 	}
+
+	for n, v := range counters {
+		res += n + " " + fmt.Sprintf("%d", v) + "\n\r"
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(res))
 }
 
 func updateGaugeHandler(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +118,7 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
-		v = fmt.Sprintf("%f", metricValue)
+		v = fmt.Sprintf("%.3f", metricValue)
 	case counter:
 		metricValue, err := s.GetCounter(n)
 		if err != nil {

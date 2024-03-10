@@ -50,6 +50,10 @@ func (ms *MemStorage) GetGauge(name string) (float64, error) {
 	return ms.gauge[name], nil
 }
 
+func (ms *MemStorage) GetAllGauges() map[string]float64 {
+	return ms.gauge
+}
+
 func (ms *MemStorage) AddCounter(name string, value string) error {
 	convertedVal, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
 	if err != nil {
@@ -67,4 +71,8 @@ func (ms *MemStorage) GetCounter(name string) (int64, error) {
 	}
 
 	return ms.counter[name], nil
+}
+
+func (ms *MemStorage) GetAllCounters() map[string]int64 {
+	return ms.counter
 }
