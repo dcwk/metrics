@@ -109,17 +109,19 @@ func TestGetMetrics(t *testing.T) {
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
 	count := 1000
+	a := 0
 
 	for i := 0; i < count; i++ {
-		v := rand.Intn(1024)
+		v := rand.Intn(1024) + 1
+		a += v
 		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
-		rp, _ := testRequest(t, ts, "POST", path)
-		defer rp.Body.Close()
+		r, _ := testRequest(t, ts, "POST", path)
+		r.Body.Close()
 
 		path = "/value/counter/testSetGet" + id
-		rg, resp := testRequest(t, ts, "GET", path)
-		defer rg.Body.Close()
+		r1, resp1 := testRequest(t, ts, "GET", path)
 
-		assert.Equal(t, fmt.Sprintf("%d", v), resp)
+		assert.Equal(t, fmt.Sprintf("%d", a), resp1)
+		r1.Body.Close()
 	}
 }
