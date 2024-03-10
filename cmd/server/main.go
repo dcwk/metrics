@@ -94,7 +94,6 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		v = fmt.Sprintf("%f", metricValue)
-		break
 	case counter:
 		metricValue, err := s.GetCounter(n)
 		if err != nil {
@@ -102,9 +101,8 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		v = fmt.Sprintf("%d", metricValue)
-		break
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(n + " " + v))
+	w.Write([]byte(v))
 }
