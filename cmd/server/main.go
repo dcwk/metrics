@@ -54,7 +54,7 @@ func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
-	stor := storage.NewStorage()
+	stor := storage.GetStorage()
 	gauges := stor.GetAllGauges()
 	counters := stor.GetAllCounters()
 	res := ""
@@ -78,7 +78,7 @@ func getMetricHandler(w http.ResponseWriter, r *http.Request) {
 	t := chi.URLParam(r, "type")
 	n := chi.URLParam(r, "name")
 	v := ""
-	s := storage.NewStorage()
+	s := storage.GetStorage()
 
 	switch t {
 	default:
@@ -111,7 +111,7 @@ func updateMetricHandler(w http.ResponseWriter, r *http.Request) {
 	t := chi.URLParam(r, "type")
 	mn := chi.URLParam(r, "name")
 	mv := chi.URLParam(r, "value")
-	stor := storage.NewStorage()
+	stor := storage.GetStorage()
 
 	switch t {
 	default:

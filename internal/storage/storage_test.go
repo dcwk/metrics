@@ -28,7 +28,7 @@ func TestGauge(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			storage := NewStorage()
+			storage := GetStorage()
 			for k, v := range test.data {
 				err := storage.AddGauge(k, v)
 				assert.NoError(t, err)
@@ -62,14 +62,14 @@ func TestCounter(t *testing.T) {
 		{
 			name: "Test can save counter",
 			data: map[string]string{"test": "10"},
-			want: map[string]int64{"test": 10},
+			want: map[string]int64{"test": 20},
 			err:  "",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			storage := NewStorage()
+			storage := GetStorage()
 			for k, v := range test.data {
 				err := storage.AddCounter(k, v)
 				assert.NoError(t, err)

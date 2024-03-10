@@ -7,7 +7,10 @@ import (
 	"sync"
 )
 
-var stor *MemStorage
+var (
+	once    sync.Once
+	storage *MemStorage
+)
 
 type Storage interface {
 	AddGauge(name string, value float64)
@@ -17,90 +20,91 @@ type Storage interface {
 }
 
 type Gauge struct {
-	mx sync.RWMutex
-	m  map[string]float64
+	gaugeMx sync.RWMutex
+	gauge   map[string]float64
 }
 
 type Counter struct {
-	mx sync.RWMutex
-	m  map[string]int64
+	counterMx sync.RWMutex
+	counter   map[string]int64
 }
+
 type MemStorage struct {
 	Gauge
 	Counter
 }
 
-func NewStorage() *MemStorage {
-	if stor == nil {
-		stor = &MemStorage{
-			Gauge{m: make(map[string]float64, 1000)},
-			Counter{m: make(map[string]int64, 1000)},
+func GetStorage() *MemStorage {
+	once.Do(func() {
+		storage = &MemStorage{
+			Gauge{gauge: make(map[string]float64, 1000)},
+			Counter{counter: make(map[string]int64, 1000)},
 		}
-	}
+	})
 
-	return stor
+	return storage
 }
 
 func (ms *MemStorage) AddGauge(name string, value string) error {
-	ms.Gauge.mx.Lock()
-	defer ms.Gauge.mx.Unlock()
+	ms.gaugeMx.Lock()
+	defer ms.gaugeMx.Unlock()
 
 	convertedVal, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
 	if err != nil {
 		return errors.New("unsupported gauge value")
 	}
 
-	ms.Gauge.m[name] = convertedVal
+	ms.gauge[name] = convertedVal
 
 	return nil
 }
 
 func (ms *MemStorage) GetGauge(name string) (float64, error) {
-	ms.Gauge.mx.RLock()
-	defer ms.Gauge.mx.RUnlock()
+	ms.gaugeMx.RLock()
+	defer ms.gaugeMx.RUnlock()
 
-	if ms.Gauge.m[name] == 0 {
+	if ms.gauge[name] == 0 {
 		return 0, errors.New("gauge not found")
 	}
 
-	return ms.Gauge.m[name], nil
+	return ms.gauge[name], nil
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
-	ms.Gauge.mx.RLock()
-	defer ms.Gauge.mx.RUnlock()
+	ms.gaugeMx.RLock()
+	defer ms.gaugeMx.RUnlock()
 
-	return ms.Gauge.m
+	return ms.gauge
 }
 
 func (ms *MemStorage) AddCounter(name string, value string) error {
-	ms.Counter.mx.Lock()
-	defer ms.Counter.mx.Unlock()
+	ms.counterMx.Lock()
+	defer ms.counterMx.Unlock()
 
 	convertedVal, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
 	if err != nil {
 		return errors.New("unsupported counter value")
 	}
 
-	ms.Counter.m[name] = convertedVal
+	ms.counter[name] += convertedVal
 
 	return nil
 }
 
 func (ms *MemStorage) GetCounter(name string) (int64, error) {
-	ms.Counter.mx.RLock()
-	defer ms.Counter.mx.RUnlock()
+	ms.counterMx.RLock()
+	defer ms.counterMx.RUnlock()
 
-	if ms.Counter.m[name] == 0 {
+	if ms.counter[name] == 0 {
 		return 0, errors.New("counter not found")
 	}
 
-	return ms.Counter.m[name], nil
+	return ms.counter[name], nil
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
-	ms.Counter.mx.RLock()
-	defer ms.Counter.mx.RUnlock()
+	ms.counterMx.RLock()
+	defer ms.counterMx.RUnlock()
 
-	return ms.Counter.m
+	return ms.counter
 }
