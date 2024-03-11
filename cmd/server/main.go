@@ -1,12 +1,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"net/http"
-	"os"
 )
 
 const (
@@ -14,13 +13,11 @@ const (
 	counter = "counter"
 )
 
-var flagRunAddr string
-
 func main() {
-	parseFlags()
-	fmt.Println("Running server on", flagRunAddr)
+	conf := config.NewServerConf()
+	fmt.Println("Running server on", conf.ServerAddr)
 
-	if err := http.ListenAndServe(flagRunAddr, Router()); err != nil {
+	if err := http.ListenAndServe(conf.ServerAddr, Router()); err != nil {
 		panic(err)
 	}
 }
@@ -39,15 +36,6 @@ func Router() chi.Router {
 	})
 
 	return r
-}
-
-func parseFlags() {
-	flag.StringVar(&flagRunAddr, "a", ":8080", "address and port to run server")
-	flag.Parse()
-
-	if envAddress := os.Getenv("ADDRESS"); envAddress != "" {
-		flagRunAddr = envAddress
-	}
 }
 
 func getAllMetricsHandler(w http.ResponseWriter, r *http.Request) {
