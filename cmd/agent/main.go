@@ -2,37 +2,28 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
+	"github.com/dcwk/metrics/internal/config"
 	"log"
 	"net/http"
-	"os"
 	"runtime"
-	"strconv"
 	"time"
 )
 
-var (
-	flagServerAddr string
-	reportInterval int64
-	pollInterval   int64
-)
-
 func main() {
-	parseFlags()
-	fmt.Println("Sending metrics to", flagServerAddr)
-
+	conf := config.NewClientConf()
 	var pollCount int64 = 0
+	fmt.Println("Sending metrics to", conf.ServerAddr)
 
 	for {
-		time.Sleep(time.Duration(pollInterval) * time.Second)
+		time.Sleep(time.Duration(conf.PollInterval) * time.Second)
 		gauges := getGauges()
 
-		if pollCount%reportInterval == 0 {
+		if pollCount%conf.ReportInterval == 0 {
 			for k, v := range gauges {
 				r := bytes.NewReader([]byte(""))
 				resp, err := http.Post(
-					fmt.Sprintf("http://%s/update/gauge/%s/%f", flagServerAddr, k, v),
+					fmt.Sprintf("http://%s/update/gauge/%s/%f", conf.ServerAddr, k, v),
 					"Content-Type: text/plain",
 					r,
 				)
@@ -84,32 +75,4 @@ func getGauges() map[string]float64 {
 	gauges["TotalAlloc"] = float64(ms.TotalAlloc)
 
 	return gauges
-}
-
-func parseFlags() {
-	flag.StringVar(&flagServerAddr, "a", ":8080", "metrics server address")
-	flag.Int64Var(&reportInterval, "r", 10, "sending frequency interval")
-	flag.Int64Var(&pollInterval, "p", 2, "metrics reading frequency")
-
-	flag.Parse()
-
-	if envAddress := os.Getenv("ADDRESS"); envAddress != "" {
-		flagServerAddr = envAddress
-	}
-
-	if envReportInterval := os.Getenv("REPORT_INTERVAL"); envReportInterval != "" {
-		interval, err := strconv.ParseInt(envReportInterval, 10, 64)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		reportInterval = interval
-	}
-
-	if envPollInterval := os.Getenv("POLL_INTERVAL"); envPollInterval != "" {
-		interval, err := strconv.ParseInt(envPollInterval, 10, 64)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		pollInterval = interval
-	}
 }
