@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
-	"metrics/internal/storage"
 	"net/http"
 	"os"
 )
