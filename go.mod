@@ -1,4 +1,4 @@
-module metrics
+module github.com/dcwk/metrics
 
 go 1.21
 
