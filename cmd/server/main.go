@@ -93,7 +93,7 @@ func getMetricHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
-		v = fmt.Sprintf("%.3f", metricValue)
+		v = fmt.Sprintf("%v", metricValue)
 	case counter:
 		metricValue, err := s.GetCounter(n)
 		if err != nil {
