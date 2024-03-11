@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/dcwk/metrics/internal/server"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -29,7 +30,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.
 }
 
 func TestUpdateMetrics(t *testing.T) {
-	ts := httptest.NewServer(Router())
+	ts := httptest.NewServer(server.Router())
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -109,7 +110,7 @@ func TestUpdateMetrics(t *testing.T) {
 }
 
 func TestGetMetrics(t *testing.T) {
-	ts := httptest.NewServer(Router())
+	ts := httptest.NewServer(server.Router())
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
