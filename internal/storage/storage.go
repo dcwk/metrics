@@ -7,11 +7,6 @@ import (
 	"sync"
 )
 
-var (
-	once    sync.Once
-	storage *MemStorage
-)
-
 type Storage interface {
 	AddGauge(name string, value string) error
 	GetGauge(name string) (float64, error)
@@ -36,15 +31,11 @@ type MemStorage struct {
 	Counter
 }
 
-func GetStorage() *MemStorage {
-	once.Do(func() {
-		storage = &MemStorage{
-			Gauge{gauge: make(map[string]float64, 1000)},
-			Counter{counter: make(map[string]int64, 1000)},
-		}
-	})
-
-	return storage
+func NewStorage() *MemStorage {
+	return &MemStorage{
+		Gauge{gauge: make(map[string]float64, 1000)},
+		Counter{counter: make(map[string]int64, 1000)},
+	}
 }
 
 func (ms *MemStorage) AddGauge(name string, value string) error {
