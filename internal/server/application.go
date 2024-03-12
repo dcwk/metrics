@@ -9,9 +9,10 @@ import (
 	"net/http"
 )
 
-func Run(conf config.ServerConf) {
+func Run(conf *config.ServerConf) {
 	s := storage.NewStorage()
 	fmt.Println("Running server on", conf.ServerAddr)
+
 	if err := http.ListenAndServe(conf.ServerAddr, Router(s)); err != nil {
 		panic(err)
 	}
