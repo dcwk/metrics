@@ -7,14 +7,13 @@ import (
 	"net/http"
 )
 
-func GetMetric(w http.ResponseWriter, r *http.Request) {
+func GetMetric(w http.ResponseWriter, r *http.Request, s storage.Storage) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
 	t := chi.URLParam(r, "type")
 	n := chi.URLParam(r, "name")
 	v := ""
-	s := storage.GetStorage()
 
 	switch t {
 	default:

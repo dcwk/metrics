@@ -11,11 +11,10 @@ const (
 	counter = "counter"
 )
 
-func GetAllMetrics(w http.ResponseWriter, r *http.Request) {
+func GetAllMetrics(w http.ResponseWriter, r *http.Request, s storage.Storage) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
-	s := storage.GetStorage()
 	gauges := s.GetAllGauges()
 	counters := s.GetAllCounters()
 	res := ""

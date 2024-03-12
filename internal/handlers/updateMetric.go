@@ -6,14 +6,13 @@ import (
 	"net/http"
 )
 
-func UpdateMetric(w http.ResponseWriter, r *http.Request) {
+func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.Storage) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
 	t := chi.URLParam(r, "type")
 	mn := chi.URLParam(r, "name")
 	mv := chi.URLParam(r, "value")
-	s := storage.GetStorage()
 
 	switch t {
 	default:
