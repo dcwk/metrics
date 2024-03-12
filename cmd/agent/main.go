@@ -7,7 +7,11 @@ import (
 )
 
 func main() {
-	conf := config.NewClientConf()
+	conf, err := config.NewClientConf()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err := client.Run(conf); err != nil {
 		log.Fatal(err)
 

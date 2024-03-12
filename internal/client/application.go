@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func Run(conf config.ClientConf) error {
-	var pollCount int64 = 0
+func Run(conf *config.ClientConf) error {
+	var pollCount int64
 	fmt.Println("Sending metrics to", conf.ServerAddr)
 
 	for {

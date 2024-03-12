@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 	"github.com/caarlos0/env"
-	"log"
 )
 
 type ClientConf struct {
@@ -12,7 +11,7 @@ type ClientConf struct {
 	PollInterval   int64  `env:"POLL_INTERVAL"`
 }
 
-func NewClientConf() ClientConf {
+func NewClientConf() (*ClientConf, error) {
 	conf := ClientConf{}
 
 	flag.StringVar(&conf.ServerAddr, "a", ":8080", "metrics server address")
@@ -22,8 +21,8 @@ func NewClientConf() ClientConf {
 
 	err := env.Parse(&conf)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return conf
+	return &conf, nil
 }
