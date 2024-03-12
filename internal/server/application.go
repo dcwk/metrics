@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 func Run(conf *config.ServerConf) {

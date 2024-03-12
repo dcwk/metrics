@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/dcwk/metrics/internal/client"
 	"github.com/dcwk/metrics/internal/config"
-	"log"
 )
 
 func main() {

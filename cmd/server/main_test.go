@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/dcwk/metrics/internal/server"
-	"github.com/dcwk/metrics/internal/storage"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+
+	"github.com/dcwk/metrics/internal/server"
+	"github.com/dcwk/metrics/internal/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {

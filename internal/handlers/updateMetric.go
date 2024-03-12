@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.Storage) {

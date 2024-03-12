@@ -2,9 +2,10 @@ package client
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
-	"time"
 )
 
 func Run(conf *config.ClientConf) error {

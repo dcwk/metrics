@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/dcwk/metrics/internal/storage"
 	"net/http"
+
+	"github.com/dcwk/metrics/internal/storage"
 )
 
 const (

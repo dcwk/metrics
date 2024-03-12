@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 func GetMetric(w http.ResponseWriter, r *http.Request, s storage.Storage) {
