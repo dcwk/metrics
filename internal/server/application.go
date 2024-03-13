@@ -26,16 +26,12 @@ func Router(s storage.DataKeeper) chi.Router {
 		handlers.GetAllMetrics(w, r, s)
 	})
 
-	r.Route("/value/", func(r chi.Router) {
-		r.Get("/{type}/{name}", func(w http.ResponseWriter, r *http.Request) {
-			handlers.GetMetric(w, r, s)
-		})
+	r.Get("/value/{type}/{name}", func(w http.ResponseWriter, r *http.Request) {
+		handlers.GetMetric(w, r, s)
 	})
 
-	r.Route("/update/", func(r chi.Router) {
-		r.Post("/{type}/{name}/{value}", func(w http.ResponseWriter, r *http.Request) {
-			handlers.UpdateMetric(w, r, s)
-		})
+	r.Post("/update/{type}/{name}/{value}", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateMetric(w, r, s)
 	})
 
 	return r
