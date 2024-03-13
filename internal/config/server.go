@@ -11,7 +11,7 @@ type ServerConf struct {
 }
 
 func NewServerConf() (*ServerConf, error) {
-	conf := ServerConf{}
+	conf := &ServerConf{}
 
 	flag.StringVar(&conf.ServerAddr, "a", ":8080", "address and port to run server")
 	flag.Parse()
@@ -21,5 +21,5 @@ func NewServerConf() (*ServerConf, error) {
 		return nil, err
 	}
 
-	return &conf, err
+	return conf, err
 }

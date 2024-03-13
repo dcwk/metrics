@@ -13,7 +13,7 @@ type ClientConf struct {
 }
 
 func NewClientConf() (*ClientConf, error) {
-	conf := ClientConf{}
+	conf := &ClientConf{}
 
 	flag.StringVar(&conf.ServerAddr, "a", ":8080", "metrics server address")
 	flag.Int64Var(&conf.ReportInterval, "r", 10, "sending frequency interval")
@@ -25,5 +25,5 @@ func NewClientConf() (*ClientConf, error) {
 		return nil, err
 	}
 
-	return &conf, nil
+	return conf, nil
 }
