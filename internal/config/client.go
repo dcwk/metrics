@@ -20,7 +20,7 @@ func NewClientConf() (*ClientConf, error) {
 	flag.Int64Var(&conf.PollInterval, "p", 2, "metrics reading frequency")
 	flag.Parse()
 
-	err := env.Parse(&conf)
+	err := env.Parse(conf)
 	if err != nil {
 		return nil, err
 	}

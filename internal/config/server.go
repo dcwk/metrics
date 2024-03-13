@@ -16,7 +16,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.ServerAddr, "a", ":8080", "address and port to run server")
 	flag.Parse()
 
-	err := env.Parse(&conf)
+	err := env.Parse(conf)
 	if err != nil {
 		return nil, err
 	}
