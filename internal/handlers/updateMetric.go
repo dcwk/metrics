@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.Storage) {
+func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.DataKeeper) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 

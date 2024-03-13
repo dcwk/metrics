@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type Storage interface {
+type DataKeeper interface {
 	AddGauge(name string, value string) error
 	GetGauge(name string) (float64, error)
 	GetAllGauges() map[string]float64

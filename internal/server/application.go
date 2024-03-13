@@ -19,7 +19,7 @@ func Run(conf *config.ServerConf) {
 	}
 }
 
-func Router(s storage.Storage) chi.Router {
+func Router(s storage.DataKeeper) chi.Router {
 	r := chi.NewRouter()
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {

@@ -12,7 +12,7 @@ const (
 	counter = "counter"
 )
 
-func GetAllMetrics(w http.ResponseWriter, r *http.Request, s storage.Storage) {
+func GetAllMetrics(w http.ResponseWriter, r *http.Request, s storage.DataKeeper) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 
