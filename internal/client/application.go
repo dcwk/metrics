@@ -6,10 +6,14 @@ import (
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
+	"github.com/dcwk/metrics/internal/storage"
 )
 
 func Run(conf *config.ClientConf) error {
 	var pollCount int64
+	h := handlers.Handlers{
+		Storage: storage.NewStorage(),
+	}
 	fmt.Println("Sending metrics to", conf.ServerAddr)
 
 	for {
@@ -18,7 +22,7 @@ func Run(conf *config.ClientConf) error {
 			continue
 		}
 
-		if err := handlers.SendMetrics(conf.ServerAddr); err != nil {
+		if err := h.SendMetrics(conf.ServerAddr); err != nil {
 			return err
 		}
 
