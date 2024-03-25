@@ -3,11 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
 )
 
-func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.DataKeeper) {
+func (h *Handlers) UpdateMetric(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
 
@@ -20,12 +19,12 @@ func UpdateMetric(w http.ResponseWriter, r *http.Request, s storage.DataKeeper) 
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	case gauge:
-		if err := s.AddGauge(mn, mv); err != nil {
+		if err := h.Storage.AddGauge(mn, mv); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}
 	case counter:
-		if err := s.AddCounter(mn, mv); err != nil {
+		if err := h.Storage.AddCounter(mn, mv); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}

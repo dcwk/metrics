@@ -25,18 +25,13 @@ func Run(conf *config.ServerConf) {
 
 func Router(s storage.DataKeeper) chi.Router {
 	r := chi.NewRouter()
+	h := handlers.Handlers{
+		Storage: s,
+	}
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		handlers.GetAllMetrics(w, r, s)
-	})
-
-	r.Get("/value/{type}/{name}", func(w http.ResponseWriter, r *http.Request) {
-		handlers.GetMetric(w, r, s)
-	})
-
-	r.Post("/update/{type}/{name}/{value}", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UpdateMetric(w, r, s)
-	})
+	r.Get("/", h.GetAllMetrics)
+	r.Get("/value/{type}/{name}", h.GetMetric)
+	r.Post("/update/{type}/{name}/{value}", h.UpdateMetric)
 
 	return r
 }
