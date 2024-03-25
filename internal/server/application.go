@@ -25,6 +25,8 @@ func Run(conf *config.ServerConf) {
 
 func Router(s storage.DataKeeper) chi.Router {
 	r := chi.NewRouter()
+	r.Use(logger.RequestLogger)
+
 	h := handlers.Handlers{
 		Storage: s,
 	}

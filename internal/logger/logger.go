@@ -25,7 +25,7 @@ func Initialize(level string) error {
 	return nil
 }
 
-func RequestLogger(h http.HandlerFunc) http.Handler {
+func RequestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Log.Debug(
 			"got incoming HTTP request",
@@ -33,6 +33,6 @@ func RequestLogger(h http.HandlerFunc) http.Handler {
 			zap.String("path", r.URL.Path),
 		)
 
-		h(w, r)
+		next.ServeHTTP(w, r)
 	})
 }
