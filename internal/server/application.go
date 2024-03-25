@@ -1,18 +1,22 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
+	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 )
 
 func Run(conf *config.ServerConf) {
+	if err := logger.Initialize(conf.LogLevel); err != nil {
+		panic(err)
+	}
 	s := storage.NewStorage()
-	fmt.Println("Running server on", conf.ServerAddr)
+	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
 
 	if err := http.ListenAndServe(conf.ServerAddr, Router(s)); err != nil {
 		panic(err)
