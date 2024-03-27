@@ -5,13 +5,23 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
+
+	"github.com/dcwk/metrics/internal/models"
+	"github.com/mailru/easyjson"
 )
 
 func (h *Handlers) SendMetrics(addr string) error {
 	for k, v := range getGauges() {
 		r := bytes.NewReader([]byte(""))
+		metric := models.Metrics{
+			ID:    k,
+			MType: gauge,
+			Value: &v,
+		}
+		json, err := easyjson.Marshal(&metric)
+
 		resp, err := http.Post(
-			fmt.Sprintf("http://%s/update/gauge/%s/%f", addr, k, v),
+			fmt.Sprintf("http://%s/update/gauge/%s/%f", addr, k, json),
 			"Content-Type: text/plain",
 			r,
 		)
