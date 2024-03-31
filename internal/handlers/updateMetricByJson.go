@@ -6,6 +6,7 @@ import (
 
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/service"
+	"github.com/mailru/easyjson"
 )
 
 func (h *Handlers) UpdateMetricByJson(w http.ResponseWriter, r *http.Request) {
@@ -24,5 +25,21 @@ func (h *Handlers) UpdateMetricByJson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	metrics, err = metricsService.GetMetrics(metrics)
+	if err != nil {
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := easyjson.Marshal(metrics)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(resp); err != nil {
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
 }
