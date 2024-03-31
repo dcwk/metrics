@@ -148,7 +148,7 @@ func TestUpdateMetricsByJson(t *testing.T) {
 				Post(ts.URL + tt.url)
 			require.NoError(t, err)
 			assert.Equal(t, tt.status, resp.StatusCode())
-			assert.Equal(t, tt.want, string(resp.Body()))
+			assert.Equal(t, tt.want+"\n", string(resp.Body()))
 		})
 	}
 }
@@ -235,7 +235,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		}
 		expJSON, err := easyjson.Marshal(expMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, string(expJSON), data)
+		assert.Equal(t, string(expJSON)+"\n", data)
 	}
 }
 
@@ -289,6 +289,6 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		}
 		expJSON, err := easyjson.Marshal(expMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, string(expJSON), data)
+		assert.Equal(t, string(expJSON)+"\n", data)
 	}
 }
