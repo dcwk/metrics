@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (h *Handlers) GetMetric(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodGet
 	r.Header.Set("Content-Type", "text/plain")
 

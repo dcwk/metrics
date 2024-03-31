@@ -38,3 +38,25 @@ func (ms *MetricsService) UpdateMetrics(metrics *models.Metrics) error {
 
 	return nil
 }
+
+func (ms *MetricsService) GetMetrics(metrics *models.Metrics) (*models.Metrics, error) {
+	switch metrics.MType {
+	default:
+		return nil, errors.New("unsupported type")
+	case gauge:
+		metricValue, err := ms.storage.GetGauge(metrics.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		metrics.Value = &metricValue
+	case counter:
+		metricValue, err := ms.storage.GetCounter(metrics.ID)
+		if err != nil {
+			return nil, err
+		}
+		metrics.Delta = &metricValue
+	}
+
+	return metrics, nil
+}
