@@ -10,8 +10,6 @@ import (
 )
 
 func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	r.Header.Set("Content-Type", "application/json")
 	var metrics *models.Metrics
 	metricsService := service.NewMetricsService(h.Storage)
 	err := json.NewDecoder(r.Body).Decode(&metrics)
@@ -33,6 +31,7 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	if _, err := w.Write(resp); err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
