@@ -9,7 +9,7 @@ import (
 	"github.com/mailru/easyjson"
 )
 
-func (h *Handlers) UpdateMetricByJson(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "application/json")
 	var metrics *models.Metrics

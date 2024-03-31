@@ -196,10 +196,10 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 	for i := 0; i < count; i++ {
 		v := rand.Intn(1024) + 1
 		a += int64(v)
-		metricId := "testSetGet" + id
+		metricID := "testSetGet" + id
 		metricVal := int64(v)
 		metricsPost := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "counter",
 			Delta: &metricVal,
 		}
@@ -215,7 +215,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		assert.Equal(t, http.StatusOK, status)
 
 		metricsGet := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "counter",
 		}
 		path = "/value"
@@ -228,13 +228,13 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		require.NoError(t, err)
 		data := string(resp.Body())
 		expMetrics := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "counter",
 			Delta: &a,
 		}
-		expJson, err := easyjson.Marshal(expMetrics)
+		expJSON, err := easyjson.Marshal(expMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, string(expJson), data)
+		assert.Equal(t, string(expJSON), data)
 	}
 }
 
@@ -249,10 +249,10 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 
 	for i := 0; i < count; i++ {
 		v := rand.Intn(1024) + 1
-		metricId := "testSetGet" + id
+		metricID := "testSetGet" + id
 		metricVal := float64(v)
 		metricsPost := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "gauge",
 			Value: &metricVal,
 		}
@@ -268,7 +268,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		assert.Equal(t, http.StatusOK, status)
 
 		metricsGet := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "gauge",
 		}
 		path = "/value"
@@ -281,12 +281,12 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		require.NoError(t, err)
 		data := string(resp.Body())
 		expMetrics := &models.Metrics{
-			ID:    metricId,
+			ID:    metricID,
 			MType: "gauge",
 			Value: &metricVal,
 		}
-		expJson, err := easyjson.Marshal(expMetrics)
+		expJSON, err := easyjson.Marshal(expMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, string(expJson), data)
+		assert.Equal(t, string(expJSON), data)
 	}
 }
