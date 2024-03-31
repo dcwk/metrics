@@ -220,6 +220,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		}
 		path = "/value/"
 		body, err = easyjson.Marshal(metricsGet)
+		require.NoError(t, err)
 		resp, err = client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(body).
@@ -273,6 +274,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		}
 		path = "/value/"
 		body, err = easyjson.Marshal(metricsGet)
+		require.NoError(t, err)
 		resp, err = client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(body).
