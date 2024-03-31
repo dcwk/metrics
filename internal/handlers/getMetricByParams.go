@@ -8,8 +8,7 @@ import (
 )
 
 func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodGet
-	r.Header.Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "application/json")
 
 	t := chi.URLParam(r, "type")
 	n := chi.URLParam(r, "name")

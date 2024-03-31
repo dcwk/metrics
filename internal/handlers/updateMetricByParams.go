@@ -11,8 +11,7 @@ import (
 )
 
 func (h *Handlers) UpdateMetricByParams(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	r.Header.Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "application/json")
 	metricsService := service.NewMetricsService(h.Storage)
 
 	t := chi.URLParam(r, "type")
