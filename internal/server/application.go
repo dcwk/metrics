@@ -33,7 +33,7 @@ func Router(s storage.DataKeeper) chi.Router {
 
 	r.Get("/", h.GetAllMetrics)
 	r.Get("/value/{type}/{name}", h.GetMetric)
-	r.Post("/update/{type}/{name}/{value}", h.UpdateMetric)
+	r.Post("/update", h.UpdateMetric)
 
 	return r
 }
