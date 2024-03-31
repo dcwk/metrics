@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"io"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -50,12 +49,6 @@ func Initialize(level string) error {
 
 func RequestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req, err := io.ReadAll(r.Body)
-		if err != nil {
-			next.ServeHTTP(w, r)
-			return
-		}
-
 		responseData := &responseData{}
 		loggingWriter := loggingResponseWriter{
 			ResponseWriter: w,
@@ -69,11 +62,6 @@ func RequestLogger(next http.Handler) http.Handler {
 			zap.String("method", r.Method),
 			zap.String("path", r.URL.Path),
 			zap.Int("status", responseData.status),
-		)
-
-		Log.Debug(
-			"got incoming HTTP request body data",
-			zap.String("request", string(req)),
 		)
 	})
 }

@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/server"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/go-resty/resty/v2"
@@ -14,6 +15,9 @@ import (
 
 func TestUpdateMetrics(t *testing.T) {
 	s := storage.NewStorage()
+	if err := logger.Initialize("info"); err != nil {
+		panic(err)
+	}
 	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 
@@ -87,8 +91,8 @@ func TestUpdateMetrics(t *testing.T) {
 	for _, tt := range testTable {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := client.R().
-				SetHeader("Content-Type", "application/json").
-				SetBody(tt.bodyString).
+				SetHeader("Content-Type", tt.contentType).
+				SetBody([]byte(tt.bodyString)).
 				Post(ts.URL + tt.url)
 			require.NoError(t, err)
 

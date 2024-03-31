@@ -1,30 +1,36 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/dcwk/metrics/internal/logger"
+	"github.com/dcwk/metrics/internal/models"
 )
 
 func (h *Handlers) UpdateMetric(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
 	r.Header.Set("Content-Type", "text/plain")
+	var metrics models.Metrics
+	err := json.NewDecoder(r.Body).Decode(&metrics)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	logger.Log.Info(fmt.Sprintf("%v", metrics))
 
-	t := chi.URLParam(r, "type")
-	mn := chi.URLParam(r, "name")
-	mv := chi.URLParam(r, "value")
-
-	switch t {
+	switch metrics.MType {
 	default:
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	case gauge:
-		if err := h.Storage.AddGauge(mn, mv); err != nil {
+		if err := h.Storage.AddGauge(metrics.ID, metrics.Value); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}
 	case counter:
-		if err := h.Storage.AddCounter(mn, mv); err != nil {
+		if err := h.Storage.AddCounter(metrics.ID, metrics.Delta); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return
 		}

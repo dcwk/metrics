@@ -2,16 +2,14 @@ package storage
 
 import (
 	"errors"
-	"strconv"
-	"strings"
 	"sync"
 )
 
 type DataKeeper interface {
-	AddGauge(name string, value string) error
+	AddGauge(name string, value *float64) error
 	GetGauge(name string) (float64, error)
 	GetAllGauges() map[string]float64
-	AddCounter(name string, value string) error
+	AddCounter(name string, value *int64) error
 	GetCounter(name string) (int64, error)
 	GetAllCounters() map[string]int64
 }
@@ -38,16 +36,11 @@ func NewStorage() *MemStorage {
 	}
 }
 
-func (ms *MemStorage) AddGauge(name string, value string) error {
+func (ms *MemStorage) AddGauge(name string, value *float64) error {
 	ms.gaugeMx.Lock()
 	defer ms.gaugeMx.Unlock()
 
-	convertedVal, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
-	if err != nil {
-		return errors.New("unsupported gauge value")
-	}
-
-	ms.gauge[name] = convertedVal
+	ms.gauge[name] = *value
 
 	return nil
 }
@@ -70,16 +63,11 @@ func (ms *MemStorage) GetAllGauges() map[string]float64 {
 	return ms.gauge
 }
 
-func (ms *MemStorage) AddCounter(name string, value string) error {
+func (ms *MemStorage) AddCounter(name string, value *int64) error {
 	ms.counterMx.Lock()
 	defer ms.counterMx.Unlock()
 
-	convertedVal, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
-	if err != nil {
-		return errors.New("unsupported counter value")
-	}
-
-	ms.counter[name] += convertedVal
+	ms.counter[name] += *value
 
 	return nil
 }
