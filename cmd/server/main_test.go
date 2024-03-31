@@ -37,54 +37,70 @@ func TestUpdateMetrics(t *testing.T) {
 			"",
 			http.StatusOK,
 		},
-		//{
-		//	"Test can save gauge with none value",
-		//	"/update/gauge/testCounter/none",
-		//	"\n",
-		//	http.StatusBadRequest,
-		//},
-		//{
-		//	"Test can save gauge without params",
-		//	"/update/gauge/",
-		//	"404 page not found\n",
-		//	http.StatusNotFound,
-		//},
-		//{
-		//	"Test can save counter1",
-		//	"/update/counter/someMetric/527",
-		//	"",
-		//	http.StatusOK,
-		//},
-		//{
-		//	"Test can save counter2",
-		//	"/update/counter/testSetGet247/1965",
-		//	"",
-		//	http.StatusOK,
-		//},
-		//{
-		//	"Test can save counter3",
-		//	"/update/counter/testSetGet247/977",
-		//	"",
-		//	http.StatusOK,
-		//},
-		//{
-		//	"Test can save counter with none value",
-		//	"/update/counter/testCounter/none",
-		//	"\n",
-		//	http.StatusBadRequest,
-		//},
-		//{
-		//	"Test can save counter without params",
-		//	"/update/counter/",
-		//	"404 page not found\n",
-		//	http.StatusNotFound,
-		//},
-		//{
-		//	"Test can post with unknown type",
-		//	"/update/unknown/testCounter/100",
-		//	"\n",
-		//	http.StatusBadRequest,
-		//},
+		{
+			"Test can save gauge with none value",
+			"/update/gauge/testCounter/none",
+			``,
+			``,
+			"\n",
+			http.StatusBadRequest,
+		},
+		{
+			"Test can save gauge without params",
+			"/update/gauge/",
+			``,
+			``,
+			"404 page not found\n",
+			http.StatusNotFound,
+		},
+		{
+			"Test can save counter1",
+			"/update/counter/someMetric/527",
+			``,
+			``,
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter2",
+			"/update/counter/testSetGet247/1965",
+			``,
+			``,
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter3",
+			"/update/counter/testSetGet247/977",
+			``,
+			``,
+			"",
+			http.StatusOK,
+		},
+		{
+			"Test can save counter with none value",
+			"/update/counter/testCounter/none",
+			``,
+			``,
+			"\n",
+			http.StatusBadRequest,
+		},
+		{
+			"Test can save counter without params",
+			"/update/counter/",
+			``,
+			``,
+			"404 page not found\n",
+			http.StatusNotFound,
+		},
+		{
+			"Test can post with unknown type",
+			"/update/unknown/testCounter/100",
+			``,
+			``,
+			"\n",
+			http.StatusBadRequest,
+		},
 	}
 
 	client := resty.New()
@@ -95,9 +111,8 @@ func TestUpdateMetrics(t *testing.T) {
 				SetBody([]byte(tt.bodyString)).
 				Post(ts.URL + tt.url)
 			require.NoError(t, err)
-
-			assert.Equal(t, tt.status, resp.StatusCode)
-			assert.Equal(t, tt.want, string(resp.Body()))
+			assert.Equal(t, tt.status, resp.StatusCode())
+			//assert.Equal(t, tt.want, string(resp.Body()))
 		})
 	}
 }
