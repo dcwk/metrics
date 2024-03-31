@@ -24,11 +24,9 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	metrics, err = metricsService.GetMetrics(metrics)
 	if err != nil {
 		logger.Log.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
-	//metricsJSON, err := easyjson.Marshal(metrics)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(metrics)
