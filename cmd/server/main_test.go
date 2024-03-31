@@ -134,7 +134,7 @@ func TestUpdateMetricsByJson(t *testing.T) {
 			"/update",
 			`{"id":"StackInuse","type":"gauge","value":327680}`,
 			"application/json",
-			"",
+			`{"id":"StackInuse","type":"gauge","value":327680}`,
 			http.StatusOK,
 		},
 	}
@@ -148,6 +148,7 @@ func TestUpdateMetricsByJson(t *testing.T) {
 				Post(ts.URL + tt.url)
 			require.NoError(t, err)
 			assert.Equal(t, tt.status, resp.StatusCode())
+			assert.Equal(t, tt.want, string(resp.Body()))
 		})
 	}
 }
