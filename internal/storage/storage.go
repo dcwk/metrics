@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"sync"
 )
 
@@ -48,9 +49,9 @@ func (ms *MemStorage) GetGauge(name string) (float64, error) {
 	ms.gaugeMx.RLock()
 	defer ms.gaugeMx.RUnlock()
 
-	//if ms.gauge[name] == 0 {
-	//	return 0, errors.New("gauge not found")
-	//}
+	if ms.gauge[name] == 0 {
+		return 0, errors.New("gauge not found")
+	}
 
 	return ms.gauge[name], nil
 }
@@ -75,9 +76,9 @@ func (ms *MemStorage) GetCounter(name string) (int64, error) {
 	ms.counterMx.RLock()
 	defer ms.counterMx.RUnlock()
 
-	//if ms.counter[name] == 0 {
-	//	return 0, errors.New("counter not found")
-	//}
+	if ms.counter[name] == 0 {
+		return 0, errors.New("counter not found")
+	}
 
 	return ms.counter[name], nil
 }

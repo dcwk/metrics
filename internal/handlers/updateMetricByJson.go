@@ -10,6 +10,8 @@ import (
 )
 
 func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	var metrics *models.Metrics
 	metricsService := service.NewMetricsService(h.Storage)
 	err := json.NewDecoder(r.Body).Decode(&metrics)
@@ -32,7 +34,6 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(metrics)
 }
