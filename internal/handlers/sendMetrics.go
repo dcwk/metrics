@@ -26,7 +26,7 @@ func (h *Handlers) SendMetrics(addr string) error {
 		_, err = client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(json).
-			Post(fmt.Sprintf("http://%s/update", addr))
+			Post(fmt.Sprintf("http://%s/update/", addr))
 		if err != nil {
 			return err
 		}
