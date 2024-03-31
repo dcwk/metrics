@@ -1,37 +1,36 @@
 package handlers
 
 import (
-	"bytes"
 	"fmt"
-	"net/http"
 	"runtime"
 
 	"github.com/dcwk/metrics/internal/models"
+	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
 )
 
 func (h *Handlers) SendMetrics(addr string) error {
 	for k, v := range getGauges() {
-		r := bytes.NewReader([]byte(""))
 		metric := models.Metrics{
 			ID:    k,
 			MType: gauge,
 			Value: &v,
 		}
 		json, err := easyjson.Marshal(&metric)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(json))
 
-		resp, err := http.Post(
-			fmt.Sprintf("http://%s/update/gauge/%s/%f", addr, k, json),
-			"Content-Type: text/plain",
-			r,
-		)
+		client := resty.New()
+		_, err = client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(json).
+			Post(fmt.Sprintf("http://%s/update", addr))
 		if err != nil {
 			return err
 		}
 
-		if err := resp.Body.Close(); err != nil {
-			return err
-		}
 	}
 
 	return nil
