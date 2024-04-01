@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
@@ -18,9 +20,20 @@ func Run(conf *config.ServerConf) {
 	}
 	s := storage.NewStorage()
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
+	go Flush(s, conf)
 
 	if err := http.ListenAndServe(conf.ServerAddr, Router(s)); err != nil {
 		panic(err)
+	}
+}
+
+func Flush(s storage.DataKeeper, conf *config.ServerConf) {
+	for {
+		logger.Log.Info("start flush data")
+		fmt.Println(conf.FileStoragePath)
+		fmt.Println(conf.StoreInterval)
+		fmt.Println(conf.Restore)
+		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }
 
