@@ -16,6 +16,7 @@ type DataKeeper interface {
 	GetCounter(name string) (int64, error)
 	GetAllCounters() map[string]int64
 	GetJsonMetrics() (string, error)
+	SaveMetricsList(metricsList *models.MetricsList)
 }
 
 type Gauge struct {
@@ -120,4 +121,16 @@ func (ms *MemStorage) GetJsonMetrics() (string, error) {
 	}
 
 	return string(metricsListJSON), nil
+}
+
+func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
+	for _, v := range metricsList.List {
+		if v.MType == models.Gauge {
+			ms.gauge[v.ID] = *v.Value
+		}
+
+		if v.MType == models.Counter {
+			ms.counter[v.ID] = *v.Delta
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bufio"
 	"net/http"
 	"os"
 	"time"
@@ -8,9 +9,11 @@ import (
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
+	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/dcwk/metrics/internal/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/mailru/easyjson"
 	"go.uber.org/zap"
 )
 
@@ -18,19 +21,59 @@ func Run(conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
-	s := storage.NewStorage()
-	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-	go Flush(s, conf)
+	storage := storage.NewStorage()
+	if conf.Restore {
+		restore(storage, conf)
+	}
 
-	if err := http.ListenAndServe(conf.ServerAddr, Router(s)); err != nil {
+	go flush(storage, conf)
+	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
+	if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
 		panic(err)
 	}
 }
 
-func Flush(s storage.DataKeeper, conf *config.ServerConf) {
+func Router(storage storage.DataKeeper) chi.Router {
+	r := chi.NewRouter()
+	r.Use(logger.RequestLogger)
+	r.Use(utils.GzipMiddleware)
+
+	h := handlers.Handlers{
+		Storage: storage,
+	}
+
+	r.Get("/", h.GetAllMetrics)
+	r.Get("/value/{type}/{name}", h.GetMetricByParams)
+	r.Post("/value/", h.GetMetricByJSON)
+	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+	r.Post("/update/", h.UpdateMetricByJSON)
+
+	return r
+}
+
+func restore(storage storage.DataKeeper, conf *config.ServerConf) {
+	logger.Log.Info("start restore data from file" + conf.FileStoragePath)
+	file, err := os.OpenFile(conf.FileStoragePath, os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic(err)
+	}
+	scanner := bufio.NewScanner(file)
+	if !scanner.Scan() {
+		panic(scanner.Err())
+	}
+	data := scanner.Bytes()
+	metricsList := models.MetricsList{}
+	if err := easyjson.Unmarshal(data, &metricsList); err != nil {
+		panic(err)
+	}
+
+	storage.SaveMetricsList(&metricsList)
+}
+
+func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 	for {
-		logger.Log.Info("start flush data")
-		metricsJSON, err := s.GetJsonMetrics()
+		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
+		metricsJSON, err := storage.GetJsonMetrics()
 		if err != nil {
 			panic(err)
 		}
@@ -48,22 +91,4 @@ func Flush(s storage.DataKeeper, conf *config.ServerConf) {
 
 		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
-}
-
-func Router(s storage.DataKeeper) chi.Router {
-	r := chi.NewRouter()
-	r.Use(logger.RequestLogger)
-	r.Use(utils.GzipMiddleware)
-
-	h := handlers.Handlers{
-		Storage: s,
-	}
-
-	r.Get("/", h.GetAllMetrics)
-	r.Get("/value/{type}/{name}", h.GetMetricByParams)
-	r.Post("/value/", h.GetMetricByJSON)
-	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-	r.Post("/update/", h.UpdateMetricByJSON)
-
-	return r
 }
