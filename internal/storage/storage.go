@@ -54,7 +54,7 @@ func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) 
 	ms.gaugeMx.RLock()
 	defer ms.gaugeMx.RUnlock()
 
-	if ms.gauge[name] == 0 && allowZeroVal == false {
+	if ms.gauge[name] == 0 && !allowZeroVal {
 		return 0, errors.New("gauge not found")
 	}
 
@@ -81,7 +81,7 @@ func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) 
 	ms.counterMx.RLock()
 	defer ms.counterMx.RUnlock()
 
-	if ms.counter[name] == 0 && allowZeroVal == false {
+	if ms.counter[name] == 0 && !allowZeroVal {
 		return 0, errors.New("counter not found")
 	}
 
