@@ -36,7 +36,7 @@ func TestGauge(t *testing.T) {
 			}
 
 			for k, v := range test.want {
-				res, err := storage.GetGauge(k)
+				res, err := storage.GetGauge(k, false)
 				if test.err != "" {
 					assert.Equal(t, test.err, err.Error())
 				} else {
@@ -77,7 +77,7 @@ func TestCounter(t *testing.T) {
 			}
 
 			for k, v := range test.want {
-				res, err := storage.GetCounter(k)
+				res, err := storage.GetCounter(k, false)
 				if test.err != "" {
 					assert.Equal(t, test.err, err.Error())
 				} else {
