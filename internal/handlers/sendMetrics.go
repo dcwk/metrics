@@ -15,7 +15,7 @@ func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 	for k, v := range getGauges() {
 		metric := models.Metrics{
 			ID:    k,
-			MType: gauge,
+			MType: models.Gauge,
 			Value: &v,
 		}
 		json, err := easyjson.Marshal(&metric)
@@ -32,7 +32,7 @@ func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 
 	metric := models.Metrics{
 		ID:    "PollCount",
-		MType: counter,
+		MType: models.Counter,
 		Delta: &pollCount,
 	}
 

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -30,9 +29,12 @@ func Run(conf *config.ServerConf) {
 func Flush(s storage.DataKeeper, conf *config.ServerConf) {
 	for {
 		logger.Log.Info("start flush data")
-		fmt.Println(conf.FileStoragePath)
-		fmt.Println(conf.StoreInterval)
-		fmt.Println(conf.Restore)
+		metricsJSON, err := s.GetJsonMetrics()
+		if err != nil {
+			panic(err)
+		}
+
+		logger.Log.Info(metricsJSON)
 		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }

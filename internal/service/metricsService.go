@@ -7,11 +7,6 @@ import (
 	"github.com/dcwk/metrics/internal/storage"
 )
 
-const (
-	gauge   = "gauge"
-	counter = "counter"
-)
-
 type MetricsService struct {
 	storage storage.DataKeeper
 }
@@ -26,11 +21,11 @@ func (ms *MetricsService) UpdateMetrics(metrics *models.Metrics) error {
 	switch metrics.MType {
 	default:
 		return errors.New("type doesn't support")
-	case gauge:
+	case models.Gauge:
 		if err := ms.storage.AddGauge(metrics.ID, metrics.Value); err != nil {
 			return err
 		}
-	case counter:
+	case models.Counter:
 		if err := ms.storage.AddCounter(metrics.ID, metrics.Delta); err != nil {
 			return err
 		}
@@ -43,14 +38,14 @@ func (ms *MetricsService) GetMetrics(metrics *models.Metrics) (*models.Metrics, 
 	switch metrics.MType {
 	default:
 		return metrics, errors.New("unsupported type")
-	case gauge:
+	case models.Gauge:
 		metricValue, err := ms.storage.GetGauge(metrics.ID)
 		if err != nil {
 			return metrics, err
 		}
 
 		metrics.Value = &metricValue
-	case counter:
+	case models.Counter:
 		metricValue, err := ms.storage.GetCounter(metrics.ID)
 		if err != nil {
 			return metrics, err

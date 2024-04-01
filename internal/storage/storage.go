@@ -3,6 +3,9 @@ package storage
 import (
 	"errors"
 	"sync"
+
+	"github.com/dcwk/metrics/internal/models"
+	"github.com/mailru/easyjson"
 )
 
 type DataKeeper interface {
@@ -12,6 +15,7 @@ type DataKeeper interface {
 	AddCounter(name string, value *int64) error
 	GetCounter(name string) (int64, error)
 	GetAllCounters() map[string]int64
+	GetJsonMetrics() (string, error)
 }
 
 type Gauge struct {
@@ -88,4 +92,32 @@ func (ms *MemStorage) GetAllCounters() map[string]int64 {
 	defer ms.counterMx.RUnlock()
 
 	return ms.counter
+}
+
+func (ms *MemStorage) GetJsonMetrics() (string, error) {
+	metricsList := models.MetricsList{}
+	for k, v := range ms.gauge {
+		metric := models.Metrics{
+			ID:    k,
+			MType: models.Gauge,
+			Value: &v,
+		}
+		metricsList.List = append(metricsList.List, metric)
+	}
+
+	for k, v := range ms.counter {
+		metric := models.Metrics{
+			ID:    k,
+			MType: models.Counter,
+			Delta: &v,
+		}
+		metricsList.List = append(metricsList.List, metric)
+	}
+
+	metricsListJSON, err := easyjson.Marshal(&metricsList)
+	if err != nil {
+		return "", err
+	}
+
+	return string(metricsListJSON), nil
 }

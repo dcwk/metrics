@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -18,14 +19,14 @@ func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "", http.StatusBadRequest)
 		return
-	case gauge:
+	case models.Gauge:
 		metricValue, err := h.Storage.GetGauge(n)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
 		v = fmt.Sprintf("%v", metricValue)
-	case counter:
+	case models.Counter:
 		metricValue, err := h.Storage.GetCounter(n)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
