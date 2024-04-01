@@ -21,16 +21,15 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	metricsJSON, err := easyjson.Marshal(metrics)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	logger.Log.Info(string(metricsJSON))
 
 	metrics, err = metricsService.GetMetrics(metrics)
 	if err != nil {
 		logger.Log.Error(err.Error())
-		metricsJSON, err := easyjson.Marshal(metrics)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		logger.Log.Info(string(metricsJSON))
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}

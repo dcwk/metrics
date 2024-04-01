@@ -73,7 +73,7 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 	for {
 		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
-		metricsJSON, err := storage.GetJsonMetrics()
+		metricsJSON, err := storage.GetJSONMetrics()
 		if err != nil {
 			panic(err)
 		}

@@ -15,7 +15,7 @@ type DataKeeper interface {
 	AddCounter(name string, value *int64) error
 	GetCounter(name string) (int64, error)
 	GetAllCounters() map[string]int64
-	GetJsonMetrics() (string, error)
+	GetJSONMetrics() (string, error)
 	SaveMetricsList(metricsList *models.MetricsList)
 }
 
@@ -95,7 +95,7 @@ func (ms *MemStorage) GetAllCounters() map[string]int64 {
 	return ms.counter
 }
 
-func (ms *MemStorage) GetJsonMetrics() (string, error) {
+func (ms *MemStorage) GetJSONMetrics() (string, error) {
 	metricsList := models.MetricsList{}
 	for k, v := range ms.gauge {
 		metric := models.Metrics{
