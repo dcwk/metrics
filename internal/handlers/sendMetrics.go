@@ -64,8 +64,8 @@ func getGauges() map[string]float64 {
 	gauges := map[string]float64{}
 	ms := runtime.MemStats{}
 	runtime.ReadMemStats(&ms)
-
 	gauges["Alloc"] = float64(ms.Alloc)
+	gauges["GCCPUFraction"] = float64(ms.GCCPUFraction)
 	gauges["BuckHashSys"] = float64(ms.BuckHashSys)
 	gauges["Frees"] = float64(ms.Frees)
 	gauges["GCSys"] = float64(ms.GCSys)
