@@ -19,7 +19,7 @@ func NewClientConf() (*ClientConf, error) {
 	flag.StringVar(&conf.ServerAddr, "a", ":8080", "metrics server address")
 	flag.Int64Var(&conf.ReportInterval, "r", 10, "sending frequency interval")
 	flag.Int64Var(&conf.PollInterval, "p", 2, "metrics reading frequency")
-	flag.StringVar(&conf.LogLevel, "l", "debug", "log level")
+	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
 	flag.Parse()
 
 	err := env.Parse(conf)
