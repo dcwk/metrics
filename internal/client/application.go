@@ -1,6 +1,7 @@
 package client
 
 import (
+	"runtime"
 	"time"
 
 	"github.com/dcwk/metrics/internal/config"
@@ -23,6 +24,8 @@ func Run(conf *config.ClientConf) error {
 		time.Sleep(time.Duration(conf.PollInterval) * time.Second)
 		if pollCount%(conf.ReportInterval/conf.PollInterval) != 0 {
 			pollCount++
+			ms := runtime.MemStats{}
+			runtime.ReadMemStats(&ms)
 			continue
 		}
 
