@@ -37,7 +37,7 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		}
 
 		logger.Log.Info(string(metricsJSON))
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 

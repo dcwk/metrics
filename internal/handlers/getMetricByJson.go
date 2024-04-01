@@ -7,6 +7,7 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/service"
+	"github.com/mailru/easyjson"
 )
 
 func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +25,13 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	metrics, err = metricsService.GetMetrics(metrics)
 	if err != nil {
 		logger.Log.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusNotFound)
+		metricsJSON, err := easyjson.Marshal(metrics)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		logger.Log.Info(string(metricsJSON))
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 
