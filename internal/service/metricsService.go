@@ -39,14 +39,14 @@ func (ms *MetricsService) GetMetrics(metrics *models.Metrics) (*models.Metrics, 
 	default:
 		return metrics, errors.New("unsupported type")
 	case models.Gauge:
-		metricValue, err := ms.storage.GetGauge(metrics.ID)
+		metricValue, err := ms.storage.GetGauge(metrics.ID, true)
 		if err != nil {
 			return metrics, err
 		}
 
 		metrics.Value = &metricValue
 	case models.Counter:
-		metricValue, err := ms.storage.GetCounter(metrics.ID)
+		metricValue, err := ms.storage.GetCounter(metrics.ID, true)
 		if err != nil {
 			return metrics, err
 		}

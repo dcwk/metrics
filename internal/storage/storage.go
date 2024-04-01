@@ -10,10 +10,10 @@ import (
 
 type DataKeeper interface {
 	AddGauge(name string, value *float64) error
-	GetGauge(name string) (float64, error)
+	GetGauge(name string, allowZeroVal bool) (float64, error)
 	GetAllGauges() map[string]float64
 	AddCounter(name string, value *int64) error
-	GetCounter(name string) (int64, error)
+	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
 	GetJSONMetrics() (string, error)
 	SaveMetricsList(metricsList *models.MetricsList)
@@ -50,11 +50,11 @@ func (ms *MemStorage) AddGauge(name string, value *float64) error {
 	return nil
 }
 
-func (ms *MemStorage) GetGauge(name string) (float64, error) {
+func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
 	ms.gaugeMx.RLock()
 	defer ms.gaugeMx.RUnlock()
 
-	if ms.gauge[name] == 0 {
+	if ms.gauge[name] == 0 && allowZeroVal == false {
 		return 0, errors.New("gauge not found")
 	}
 
@@ -77,11 +77,11 @@ func (ms *MemStorage) AddCounter(name string, value *int64) error {
 	return nil
 }
 
-func (ms *MemStorage) GetCounter(name string) (int64, error) {
+func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
 	ms.counterMx.RLock()
 	defer ms.counterMx.RUnlock()
 
-	if ms.counter[name] == 0 {
+	if ms.counter[name] == 0 && allowZeroVal == false {
 		return 0, errors.New("counter not found")
 	}
 

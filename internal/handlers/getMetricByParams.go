@@ -20,14 +20,14 @@ func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	case models.Gauge:
-		metricValue, err := h.Storage.GetGauge(n)
+		metricValue, err := h.Storage.GetGauge(n, false)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
 		v = fmt.Sprintf("%v", metricValue)
 	case models.Counter:
-		metricValue, err := h.Storage.GetCounter(n)
+		metricValue, err := h.Storage.GetCounter(n, false)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
