@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -152,35 +153,35 @@ func TestUpdateMetricsByJson(t *testing.T) {
 	}
 }
 
-//func TestGetMetricsByParams(t *testing.T) {
-//	s := storage.NewStorage()
-//	ts := httptest.NewServer(server.Router(s))
-//	defer ts.Close()
-//	path := ""
-//	id := strconv.Itoa(rand.Intn(256))
-//	count := 1000
-//	a := 0
-//	client := resty.New()
-//
-//	for i := 0; i < count; i++ {
-//		v := rand.Intn(1024) + 1
-//		a += v
-//		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
-//		resp, err := client.R().
-//			SetHeader("Content-Type", "text/html").
-//			Post(ts.URL + path)
-//		require.NoError(t, err)
-//		assert.Equal(t, http.StatusOK, resp.StatusCode())
-//
-//		path = "/value/counter/testSetGet" + id
-//		resp, err = client.R().
-//			SetHeader("Content-Type", "text/html").
-//			Get(ts.URL + path)
-//
-//		require.NoError(t, err)
-//		assert.Equal(t, fmt.Sprintf("%d", a), string(resp.Body()))
-//	}
-//}
+func TestGetMetricsByParams(t *testing.T) {
+	s := storage.NewStorage()
+	ts := httptest.NewServer(server.Router(s))
+	defer ts.Close()
+	path := ""
+	id := strconv.Itoa(rand.Intn(256))
+	count := 1000
+	a := 0
+	client := resty.New()
+
+	for i := 0; i < count; i++ {
+		v := rand.Intn(1024) + 1
+		a += v
+		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
+		resp, err := client.R().
+			SetHeader("Content-Type", "text/html").
+			Post(ts.URL + path)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode())
+
+		path = "/value/counter/testSetGet" + id
+		resp, err = client.R().
+			SetHeader("Content-Type", "text/html").
+			Get(ts.URL + path)
+
+		require.NoError(t, err)
+		assert.Equal(t, fmt.Sprintf("%d", a), string(resp.Body()))
+	}
+}
 
 func TestGetCounterMetricsByJson(t *testing.T) {
 	s := storage.NewStorage()
