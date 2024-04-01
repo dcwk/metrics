@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"runtime"
 
-	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
@@ -23,7 +22,7 @@ func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 			return err
 		}
 
-		logger.Log.Info(string(json))
+		//logger.Log.Info(string(json))
 
 		if err := send(string(json), addr); err != nil {
 			return err
