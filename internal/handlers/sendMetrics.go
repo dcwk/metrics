@@ -20,7 +20,6 @@ func (h *Handlers) SendMetrics(addr string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(json))
 
 		client := resty.New()
 		_, err = client.R().
