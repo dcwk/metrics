@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dcwk/metrics/internal/config"
@@ -34,7 +35,17 @@ func Flush(s storage.DataKeeper, conf *config.ServerConf) {
 			panic(err)
 		}
 
-		logger.Log.Info(metricsJSON)
+		file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := file.Write([]byte(metricsJSON)); err != nil {
+			panic(err)
+		}
+		if err := file.Close(); err != nil {
+			panic(err)
+		}
+
 		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }
