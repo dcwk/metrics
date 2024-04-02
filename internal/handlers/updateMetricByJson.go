@@ -37,10 +37,6 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	metrics, err = metricsService.GetMetrics(metrics)
 	if err != nil {
 		logger.Log.Error(err.Error())
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
 		logger.Log.Info(string(metricsJSON))
 		http.Error(w, "", http.StatusNotFound)
 		return
