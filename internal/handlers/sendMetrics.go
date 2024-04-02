@@ -53,7 +53,7 @@ func send(metricsJSON string, addr string) error {
 	_, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(metricsJSON).
-		Post(fmt.Sprintf("http://%s/update/", addr))
+		Post(fmt.Sprintf("%s/update/", addr))
 	if err != nil {
 		return err
 	}
