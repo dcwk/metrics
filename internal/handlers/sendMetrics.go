@@ -11,7 +11,7 @@ import (
 	"github.com/mailru/easyjson"
 )
 
-func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
+func (h *Handlers) SendMetrics(addr string, pollCount *int64) error {
 	for k, v := range getGauges() {
 		metric := models.Metrics{
 			ID:    k,
@@ -33,7 +33,7 @@ func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 	metric := models.Metrics{
 		ID:    "PollCount",
 		MType: models.Counter,
-		Delta: &pollCount,
+		Delta: pollCount,
 	}
 
 	json, err := easyjson.Marshal(&metric)

@@ -12,27 +12,38 @@ import (
 
 func Run(conf *config.ClientConf) error {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
-		panic(err)
+		return err
 	}
 	var pollCount int64
+
+	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
+
+	go updateMemStat(conf.PollInterval, &pollCount)
+	updateMetrics(conf.ServerAddr, conf.ReportInterval, &pollCount)
+
+	return nil
+}
+
+func updateMemStat(pollInterval int64, pollCount *int64) {
+	for {
+		time.Sleep(time.Duration(pollInterval) * time.Second)
+		ms := runtime.MemStats{}
+		runtime.ReadMemStats(&ms)
+		*pollCount++
+	}
+}
+
+func updateMetrics(serverAddr string, reportInterval int64, pollCount *int64) error {
 	h := handlers.Handlers{
 		Storage: storage.NewStorage(),
 	}
-	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
 
 	for {
-		time.Sleep(time.Duration(conf.PollInterval) * time.Second)
-		if pollCount%(conf.ReportInterval/conf.PollInterval) != 0 {
-			pollCount++
-			ms := runtime.MemStats{}
-			runtime.ReadMemStats(&ms)
-			continue
-		}
+		time.Sleep(time.Duration(reportInterval) * time.Second)
 
-		if err := h.SendMetrics(conf.ServerAddr, pollCount); err != nil {
+		if err := h.SendMetrics(serverAddr, pollCount); err != nil {
+
 			return err
 		}
-
-		pollCount++
 	}
 }
