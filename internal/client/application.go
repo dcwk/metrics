@@ -41,6 +41,7 @@ func updateMetrics(serverAddr string, reportInterval int64, pollCount *int64) er
 	}
 
 	for {
+		time.Sleep(time.Second)
 		if err := h.SendMetrics(serverAddr, pollCount); err != nil {
 
 			return err
