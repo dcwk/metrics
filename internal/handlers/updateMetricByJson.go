@@ -22,6 +22,12 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	metricsJSON, err := easyjson.Marshal(metrics)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	logger.Log.Info(string(metricsJSON))
+
 	if err := metricsService.UpdateMetrics(metrics); err != nil {
 		logger.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -31,7 +37,6 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	metrics, err = metricsService.GetMetrics(metrics)
 	if err != nil {
 		logger.Log.Error(err.Error())
-		metricsJSON, err := easyjson.Marshal(metrics)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
