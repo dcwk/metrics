@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 
 	"github.com/dcwk/metrics/internal/logger"
@@ -23,7 +25,7 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 
 		logger.Log.Info(string(json))
 
-		if err := send(string(json), addr); err != nil {
+		if err := send(json, addr); err != nil {
 			return err
 		}
 	}
@@ -39,24 +41,44 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 		return err
 	}
 
-	if err := send(string(json), addr); err != nil {
+	if err := send(json, addr); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func send(metricsJSON string, addr string) error {
+func send(metricsJSON []byte, addr string) error {
+	body, err := compress(metricsJSON)
+	if err != nil {
+		return err
+	}
+
 	client := resty.New()
-	_, err := client.R().
+	_, err = client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept-Encoding", "gzip").
 		SetHeader("Content-Encoding", "gzip").
-		SetBody(metricsJSON).
+		SetBody(string(body)).
 		Post(fmt.Sprintf("http://%s/update/", addr))
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func compress(b []byte) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	gz := gzip.NewWriter(buf)
+
+	_, err := gz.Write(b)
+	if err != nil {
+		return nil, err
+	}
+	if err := gz.Close(); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }

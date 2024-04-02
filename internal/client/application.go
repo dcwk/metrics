@@ -13,26 +13,25 @@ func Run(conf *config.ClientConf) error {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		return err
 	}
-	var pollCount int64
 
 	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
-	if err := updateMetrics(conf, &pollCount); err != nil {
-		return err
+	agent := NewAgent(conf.PollInterval, conf.ReportInterval)
+	for {
+		go agent.Update()
+		if err := reportMetrics(conf, agent); err != nil {
+			return err
+		}
 	}
-
-	return nil
 }
 
-func updateMetrics(conf *config.ClientConf, pollCount *int64) error {
+func reportMetrics(conf *config.ClientConf, agent *Agent) error {
 	h := handlers.Handlers{
-		Storage:    storage.NewStorage(),
-		ClientConf: conf,
+		Storage: storage.NewStorage(),
 	}
 
 	for {
 		time.Sleep(time.Duration(conf.ReportInterval) * time.Second)
-		metrics := getGauges(pollCount)
-		if err := h.SendMetrics(metrics, conf.ServerAddr, pollCount); err != nil {
+		if err := h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount); err != nil {
 
 			return err
 		}
