@@ -28,10 +28,10 @@ func Run(conf *config.ClientConf) error {
 
 func updateMemStat(pollInterval int64, pollCount *int64) {
 	for {
-		time.Sleep(time.Duration(pollInterval) * time.Second)
 		ms := runtime.MemStats{}
 		runtime.ReadMemStats(&ms)
 		*pollCount++
+		time.Sleep(time.Duration(pollInterval) * time.Second)
 	}
 }
 
