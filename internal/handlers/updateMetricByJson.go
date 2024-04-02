@@ -43,19 +43,15 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	default:
 		return
 	case models.Gauge:
-		metricValue, err := h.Storage.GetGauge(metrics.ID, false)
+		metricValue, err := h.Storage.GetGauge(metrics.ID, true)
 		if err != nil {
-			logger.Log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
 		metrics.Value = &metricValue
 	case models.Counter:
-		metricValue, err := h.Storage.GetCounter(metrics.ID, false)
+		metricValue, err := h.Storage.GetCounter(metrics.ID, true)
 		if err != nil {
-			logger.Log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 		metrics.Delta = &metricValue
