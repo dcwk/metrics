@@ -19,17 +19,19 @@ func Run(conf *config.ClientConf) error {
 	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
 
 	go updateMemStat(conf.PollInterval, &pollCount)
-	updateMetrics(conf.ServerAddr, conf.ReportInterval, &pollCount)
+	if err := updateMetrics(conf.ServerAddr, conf.ReportInterval, &pollCount); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func updateMemStat(pollInterval int64, pollCount *int64) {
 	for {
-		time.Sleep(time.Duration(pollInterval) * time.Second)
 		ms := runtime.MemStats{}
 		runtime.ReadMemStats(&ms)
 		*pollCount++
+		time.Sleep(time.Duration(pollInterval) * time.Second)
 	}
 }
 
@@ -39,11 +41,10 @@ func updateMetrics(serverAddr string, reportInterval int64, pollCount *int64) er
 	}
 
 	for {
-		time.Sleep(time.Duration(reportInterval) * time.Second)
-
 		if err := h.SendMetrics(serverAddr, pollCount); err != nil {
 
 			return err
 		}
+		time.Sleep(time.Duration(reportInterval) * time.Second)
 	}
 }
