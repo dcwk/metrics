@@ -28,10 +28,17 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log.Info(string(metricsJSON))
 
-	if err := metricsService.UpdateMetrics(metrics); err != nil {
-		logger.Log.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	switch metrics.MType {
+	default:
 		return
+	case models.Gauge:
+		if err := h.Storage.AddGauge(metrics.ID, metrics.Value); err != nil {
+			return
+		}
+	case models.Counter:
+		if err := h.Storage.AddCounter(metrics.ID, metrics.Delta); err != nil {
+			return
+		}
 	}
 
 	metrics, err = metricsService.GetMetrics(metrics)
