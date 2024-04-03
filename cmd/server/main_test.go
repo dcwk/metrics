@@ -133,7 +133,7 @@ func TestUpdateMetricsByJson(t *testing.T) {
 			"Test can save gauge",
 			"/update/",
 			`{"id":"StackInuse","type":"gauge","value":327680}`,
-			"text/html",
+			"application/json",
 			`{"id":"StackInuse","type":"gauge","value":327680}`,
 			http.StatusOK,
 		},
@@ -168,14 +168,14 @@ func TestGetMetricsByParams(t *testing.T) {
 		a += v
 		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
 		resp, err := client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			Post(ts.URL + path)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode())
 
 		path = "/value/counter/testSetGet" + id
 		resp, err = client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			Get(ts.URL + path)
 
 		require.NoError(t, err)
@@ -207,7 +207,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		body, err := easyjson.Marshal(metricsPost)
 		assert.NoError(t, err)
 		resp, err := client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			SetBody(body).
 			Post(ts.URL + path)
 		require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		body, err = easyjson.Marshal(metricsGet)
 		require.NoError(t, err)
 		resp, err = client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			SetBody(body).
 			Post(ts.URL + path)
 
@@ -261,7 +261,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		body, err := easyjson.Marshal(metricsPost)
 		assert.NoError(t, err)
 		resp, err := client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			SetBody(body).
 			Post(ts.URL + path)
 		require.NoError(t, err)
@@ -276,7 +276,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		body, err = easyjson.Marshal(metricsGet)
 		require.NoError(t, err)
 		resp, err = client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			SetBody(body).
 			Post(ts.URL + path)
 
