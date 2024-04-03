@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Content-Type", "text/html;charset=UTF-8")
 
 	var metrics *models.Metrics
 	err := json.NewDecoder(r.Body).Decode(&metrics)

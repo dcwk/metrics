@@ -133,7 +133,7 @@ func TestUpdateMetricsByJson(t *testing.T) {
 			"Test can save gauge",
 			"/update/",
 			`{"id":"StackInuse","type":"gauge","value":327680}`,
-			"application/json",
+			"text/html",
 			`{"id":"StackInuse","type":"gauge","value":327680}`,
 			http.StatusOK,
 		},
@@ -207,7 +207,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		body, err := easyjson.Marshal(metricsPost)
 		assert.NoError(t, err)
 		resp, err := client.R().
-			SetHeader("Content-Type", "application/json").
+			SetHeader("Content-Type", "text/html").
 			SetBody(body).
 			Post(ts.URL + path)
 		require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 		body, err = easyjson.Marshal(metricsGet)
 		require.NoError(t, err)
 		resp, err = client.R().
-			SetHeader("Content-Type", "application/json").
+			SetHeader("Content-Type", "text/html").
 			SetBody(body).
 			Post(ts.URL + path)
 
@@ -261,7 +261,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		body, err := easyjson.Marshal(metricsPost)
 		assert.NoError(t, err)
 		resp, err := client.R().
-			SetHeader("Content-Type", "application/json").
+			SetHeader("Content-Type", "text/html").
 			SetBody(body).
 			Post(ts.URL + path)
 		require.NoError(t, err)
@@ -276,7 +276,7 @@ func TestGetGaugeMetricsByJson(t *testing.T) {
 		body, err = easyjson.Marshal(metricsGet)
 		require.NoError(t, err)
 		resp, err = client.R().
-			SetHeader("Content-Type", "application/json").
+			SetHeader("Content-Type", "text/html").
 			SetBody(body).
 			Post(ts.URL + path)
 

@@ -12,7 +12,7 @@ import (
 
 func (h *Handlers) UpdateMetricByParams(w http.ResponseWriter, r *http.Request) {
 	r.Method = http.MethodPost
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/html")
 
 	metricsService := service.NewMetricsService(h.Storage)
 

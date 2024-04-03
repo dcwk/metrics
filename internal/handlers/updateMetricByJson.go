@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/html")
 
 	var metrics *models.Metrics
 	err := json.NewDecoder(r.Body).Decode(&metrics)
