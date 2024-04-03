@@ -54,6 +54,7 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
+
 		metrics.Delta = &metricValue
 	}
 
