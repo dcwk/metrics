@@ -56,9 +56,11 @@ func send(metricsJSON []byte, addr string) error {
 
 	client := resty.New()
 	_, err = client.R().
-		SetHeader("Content-Type", "text/html").
-		SetHeader("Accept-Encoding", "gzip").
-		SetHeader("Content-Encoding", "gzip").
+		SetHeaders(map[string]string{
+			"Content-Type":     "application/json",
+			"Accept-Encoding":  "gzip",
+			"Content-Encoding": "gzip",
+		}).
 		SetBody(string(body)).
 		Post(fmt.Sprintf("http://%s/update/", addr))
 	if err != nil {
