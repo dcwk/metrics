@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
 	var metrics *models.Metrics
 	err := json.NewDecoder(r.Body).Decode(&metrics)
@@ -30,16 +30,16 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	default:
 		return
 	case models.Gauge:
-		metricValue, err := h.Storage.GetGauge(metrics.ID, true)
+		metricValue, err := h.Storage.GetGauge(metrics.ID, false)
 		if err != nil {
 			return
 		}
 
 		metrics.Value = &metricValue
 	case models.Counter:
-		metricValue, err := h.Storage.GetCounter(metrics.ID, true)
+		metricValue, err := h.Storage.GetCounter(metrics.ID, false)
 		if err != nil {
-			return
+			http.Error(w, err.Error(), http.StatusNotFound)
 		}
 		metrics.Delta = &metricValue
 	}

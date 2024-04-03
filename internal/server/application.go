@@ -55,11 +55,11 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	logger.Log.Info("start restore data from file" + conf.FileStoragePath)
 	file, err := os.OpenFile(conf.FileStoragePath, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		panic(err)
+		return
 	}
 	scanner := bufio.NewScanner(file)
 	if !scanner.Scan() {
-		panic(scanner.Err())
+		return
 	}
 	data := scanner.Bytes()
 	metricsList := models.MetricsList{}
