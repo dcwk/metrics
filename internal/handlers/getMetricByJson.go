@@ -32,6 +32,7 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	case models.Gauge:
 		metricValue, err := h.Storage.GetGauge(metrics.ID, false)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
@@ -40,6 +41,7 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		metricValue, err := h.Storage.GetCounter(metrics.ID, false)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
+			return
 		}
 		metrics.Delta = &metricValue
 	}
