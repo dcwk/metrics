@@ -6,8 +6,7 @@ import (
 )
 
 func (h *Handlers) GetAllMetrics(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodGet
-	r.Header.Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/html")
 
 	gauges := h.Storage.GetAllGauges()
 	counters := h.Storage.GetAllCounters()
