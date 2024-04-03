@@ -57,7 +57,7 @@ func send(metricsJSON []byte, addr string) error {
 	client := resty.New()
 	_, err = client.R().
 		SetHeaders(map[string]string{
-			"Content-Type":     "application/json",
+			"Content-Type":     "text/html",
 			"Accept-Encoding":  "gzip",
 			"Content-Encoding": "gzip",
 		}).
