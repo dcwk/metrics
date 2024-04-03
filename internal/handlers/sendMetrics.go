@@ -49,19 +49,19 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 }
 
 func send(metricsJSON []byte, addr string) error {
-	body, err := compress(metricsJSON)
-	if err != nil {
-		return err
-	}
+	//body, err := compress(metricsJSON)
+	//if err != nil {
+	//	return err
+	//}
 
 	client := resty.New()
-	_, err = client.R().
+	_, err := client.R().
 		SetHeaders(map[string]string{
-			"Content-Type":     "text/html",
+			"Content-Type":     "application/json",
 			"Accept-Encoding":  "gzip",
 			"Content-Encoding": "gzip",
 		}).
-		SetBody(string(body)).
+		SetBody(string(metricsJSON)).
 		Post(fmt.Sprintf("http://%s/update/", addr))
 	if err != nil {
 		return err
