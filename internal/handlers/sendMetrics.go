@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
 
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
-	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
 )
 
@@ -49,21 +52,36 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 }
 
 func send(metricsJSON []byte, addr string) error {
-	body, err := compress(metricsJSON)
+	//body, err := compress(metricsJSON)
+	//if err != nil {
+	//	return err
+	//}
+
+	//client := resty.New()
+	//_, err = client.R().
+	//	SetHeaders(map[string]string{
+	//		"Content-Type":     "application/json;charset=UTF-8",
+	//		"Accept-Encoding":  "gzip",
+	//		"Content-Encoding": "gzip",
+	//	}).
+	//	SetBody(string(body)).
+	//	Post(fmt.Sprintf("http://%s/update/", addr))
+	request, err := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf("http://%s/update/", addr),
+		strings.NewReader(string(metricsJSON)),
+	)
 	if err != nil {
 		return err
 	}
-
-	client := resty.New()
-	_, err = client.R().
-		SetHeaders(map[string]string{
-			"Content-Type":     "application/json;charset=UTF-8",
-			"Accept-Encoding":  "gzip",
-			"Content-Encoding": "gzip",
-		}).
-		SetBody(string(body)).
-		Post(fmt.Sprintf("http://%s/update/", addr))
-	if err != nil {
+	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
+	//request.Header.Set("Content-Encoding", "gzip")
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if _, err := io.Copy(os.Stdout, response.Body); err != nil {
+		return err
+	}
+	if err := response.Body.Close(); err != nil {
 		return err
 	}
 
