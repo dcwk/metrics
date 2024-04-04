@@ -25,7 +25,6 @@ func Run(conf *config.ServerConf) {
 	if conf.Restore {
 		restore(storage, conf)
 	}
-
 	go flush(storage, conf)
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
 	if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
@@ -52,6 +51,10 @@ func Router(storage storage.DataKeeper) chi.Router {
 }
 
 func restore(storage storage.DataKeeper, conf *config.ServerConf) {
+	if conf.FileStoragePath == "" {
+		return
+	}
+
 	logger.Log.Info("start restore data from file" + conf.FileStoragePath)
 	file, err := os.OpenFile(conf.FileStoragePath, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -71,16 +74,19 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 }
 
 func flush(storage storage.DataKeeper, conf *config.ServerConf) {
+	if conf.FileStoragePath == "" {
+		return
+	}
 	for {
 		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
 		metricsJSON, err := storage.GetJSONMetrics()
 		if err != nil {
-			panic(err)
+			return
 		}
 
 		file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
-			panic(err)
+			return
 		}
 		if _, err := file.Write([]byte(metricsJSON)); err != nil {
 			panic(err)
