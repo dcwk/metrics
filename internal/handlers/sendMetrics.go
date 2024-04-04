@@ -22,8 +22,7 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 		if err != nil {
 			return err
 		}
-
-		logger.Log.Info(string(json))
+		logger.Log.Info(fmt.Sprintf("reported metric JSON %s with value %f\n", k, v))
 
 		if err := send(json, addr); err != nil {
 			return err
