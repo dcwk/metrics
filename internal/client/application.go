@@ -1,7 +1,9 @@
 package client
 
 import (
+	"context"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/dcwk/metrics/internal/config"
@@ -10,32 +12,43 @@ import (
 	"github.com/dcwk/metrics/internal/storage"
 )
 
-func Run(conf *config.ClientConf) error {
+func Run(ctx context.Context, conf *config.ClientConf) error {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		return err
 	}
 
 	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
 
 	agent := NewAgent(conf.PollInterval, conf.ReportInterval)
-	for {
-		go agent.Update()
-		if err := reportMetrics(conf, agent); err != nil {
-			return err
-		}
-	}
+	go agent.pollMetrics(ctx, wg)
+	go reportMetrics(ctx, wg, conf, agent)
+
+	<-ctx.Done()
+
+	wg.Wait()
+
+	return nil
 }
 
-func reportMetrics(conf *config.ClientConf, agent *Agent) error {
+func reportMetrics(ctx context.Context, wg *sync.WaitGroup, conf *config.ClientConf, agent *Agent) {
+	reportTicker := time.NewTicker(time.Duration(conf.ReportInterval) * time.Second)
+	defer reportTicker.Stop()
+
 	h := handlers.Handlers{
 		Storage: storage.NewStorage(),
 	}
 
 	for {
-		time.Sleep(time.Duration(conf.ReportInterval) * time.Second)
-		if err := h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount); err != nil {
-
-			return err
+		select {
+		case <-ctx.Done():
+			wg.Done()
+			return
+		case <-reportTicker.C:
+			time.Sleep(time.Duration(conf.ReportInterval) * time.Second)
+			if err := h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount); err != nil {
+			}
 		}
 	}
 }
