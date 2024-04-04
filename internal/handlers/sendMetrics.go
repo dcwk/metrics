@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"log"
 
-	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
@@ -22,7 +22,7 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 		if err != nil {
 			return err
 		}
-		logger.Log.Info(fmt.Sprintf("reported metric JSON %s with value %f\n", k, v))
+		log.Printf("reported metric JSON %s with value %f\n", k, v)
 
 		if err := send(json, addr); err != nil {
 			return err

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"log"
 	"time"
 
 	"github.com/dcwk/metrics/internal/config"
@@ -14,7 +15,8 @@ func Run(conf *config.ClientConf) error {
 		return err
 	}
 
-	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
+	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
+
 	agent := NewAgent(conf.PollInterval, conf.ReportInterval)
 	for {
 		go agent.Update()

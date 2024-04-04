@@ -1,11 +1,10 @@
 package client
 
 import (
+	"log"
 	"math/rand"
 	"runtime"
 	"time"
-
-	"github.com/dcwk/metrics/internal/logger"
 )
 
 type Agent struct {
@@ -25,7 +24,8 @@ func NewAgent(pollInterval int64, reportInterval int64) *Agent {
 
 func (a *Agent) Update() {
 	for {
-		logger.Log.Info("start read metrics for agent update")
+		log.Printf("start read metrics for agent update\n")
+
 		var ms runtime.MemStats
 		runtime.ReadMemStats(&ms)
 		a.PollCount++
