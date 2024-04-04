@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/dcwk/metrics/internal/logger"
@@ -78,9 +76,6 @@ func send(metricsJSON []byte, addr string) error {
 	//request.Header.Set("Content-Encoding", "gzip")
 	client := &http.Client{}
 	response, err := client.Do(request)
-	if _, err := io.Copy(os.Stdout, response.Body); err != nil {
-		return err
-	}
 	if err := response.Body.Close(); err != nil {
 		return err
 	}
