@@ -25,11 +25,15 @@ func Run(conf *config.ServerConf) {
 	if conf.Restore {
 		restore(storage, conf)
 	}
-	go flush(storage, conf)
-	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-	if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
-		panic(err)
-	}
+
+	go func() {
+		logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
+		if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
+			panic(err)
+		}
+	}()
+
+	flush(storage, conf)
 }
 
 func Router(storage storage.DataKeeper) chi.Router {
@@ -76,9 +80,6 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
-	}
-	if conf.StoreInterval == 0 {
-		conf.StoreInterval = 1
 	}
 
 	for {
