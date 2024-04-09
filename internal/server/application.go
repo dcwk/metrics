@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"net/http"
 	"os"
 	"time"
@@ -17,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func Run(conf *config.ServerConf) {
+func Run(ctx context.Context, conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
@@ -33,7 +34,7 @@ func Run(conf *config.ServerConf) {
 		}
 	}()
 
-	flush(stor, conf)
+	flush(ctx, stor, conf)
 }
 
 func Router(storage storage.DataKeeper) chi.Router {
@@ -80,35 +81,43 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	storage.SaveMetricsList(&metricsList)
 }
 
-func flush(storage storage.DataKeeper, conf *config.ServerConf) {
+func flush(ctx context.Context, storage storage.DataKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
 	}
+	duration := time.Duration(conf.StoreInterval) * time.Second
+	if conf.StoreInterval == 0 {
+		duration = time.Duration(100) * time.Millisecond
+	}
 
+	timer := time.NewTicker(duration)
 	for {
-		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
-		metricsJSON, err := storage.GetJSONMetrics()
-		if err != nil {
+		select {
+		case <-ctx.Done():
 			return
-		}
+		case <-timer.C:
+			logger.Log.Info("start flush data to file " + conf.FileStoragePath)
+			metricsJSON, err := storage.GetJSONMetrics()
+			if err != nil {
+				return
+			}
 
-		file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil {
-			return
-		}
+			file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+			if err != nil {
+				return
+			}
 
-		n, err := file.Write([]byte(metricsJSON))
-		if err != nil {
-			panic(err)
-		}
-		if n < len(metricsJSON) {
-			return
-		}
+			n, err := file.Write([]byte(metricsJSON))
+			if err != nil {
+				panic(err)
+			}
+			if n < len(metricsJSON) {
+				return
+			}
 
-		if err := file.Close(); err != nil {
-			panic(err)
+			if err := file.Close(); err != nil {
+				panic(err)
+			}
 		}
-
-		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }
