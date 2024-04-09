@@ -77,6 +77,10 @@ func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
 	}
+	if conf.StoreInterval == 0 {
+		conf.StoreInterval = 1
+	}
+
 	for {
 		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
 		metricsJSON, err := storage.GetJSONMetrics()
