@@ -3,6 +3,7 @@ package storage
 import (
 	"testing"
 
+	"github.com/dcwk/metrics/internal/models"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -90,44 +91,40 @@ func TestCounter(t *testing.T) {
 
 func TestGetMetrics(t *testing.T) {
 	storage := NewStorage()
-	tests := []struct {
-		name string
-		data map[string]float64
-		want map[string]float64
-		err  string
+	value := float64(10.64)
+	delta := int64(10)
+
+	dataProvider := []struct {
+		data models.Metrics
 	}{
 		{
-			name: "Test fail gauge not found",
-			data: map[string]float64{"test": 10.64},
-			want: map[string]float64{"test2": 0},
-			err:  "gauge not found",
+			data: models.Metrics{
+				ID:    "test",
+				MType: models.Gauge,
+				Value: &value,
+			},
 		},
 		{
-			name: "Test can save gauge",
-			data: map[string]float64{"test": 10.64},
-			want: map[string]float64{"test": 10.64},
-			err:  "",
+
+			data: models.Metrics{
+				ID:    "test",
+				MType: models.Counter,
+				Delta: &delta,
+			},
 		},
 	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			for k, v := range test.data {
-				err := storage.AddGauge(k, &v)
+	t.Run("test can get json metrics", func(t *testing.T) {
+		for _, test := range dataProvider {
+			if test.data.MType == models.Gauge {
+				err := storage.AddGauge(test.data.ID, test.data.Value)
+				assert.NoError(t, err)
+			} else {
+				err := storage.AddCounter(test.data.ID, test.data.Delta)
 				assert.NoError(t, err)
 			}
+		}
 
-			for k, v := range test.want {
-				res, err := storage.GetGauge(k, false)
-				if test.err != "" {
-					assert.Equal(t, test.err, err.Error())
-				} else {
-					assert.Equal(t, v, res)
-				}
-			}
-		})
-	}
-
-	metricsList, _ := storage.GetJSONMetrics()
-	assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64}]}`)
+		metricsList, _ := storage.GetJSONMetrics()
+		assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64},{"id":"test","type":"counter","delta":10}]}`)
+	})
 }
