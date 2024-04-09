@@ -129,7 +129,7 @@ func TestGetMetrics(t *testing.T) {
 	})
 }
 
-func testCanSaveMetricsList(t *testing.T) {
+func TestCanSaveMetricsList(t *testing.T) {
 	t.Run("test can get json metrics", func(t *testing.T) {
 
 		storage := NewStorage()
