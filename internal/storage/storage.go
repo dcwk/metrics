@@ -126,11 +126,11 @@ func (ms *MemStorage) GetJSONMetrics() (string, error) {
 func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
 	for _, v := range metricsList.List {
 		if v.MType == models.Gauge {
-			ms.gauge[v.ID] = *v.Value
+			_ = ms.AddGauge(v.ID, v.Value)
 		}
 
 		if v.MType == models.Counter {
-			ms.counter[v.ID] = *v.Delta
+			_ = ms.AddCounter(v.ID, v.Delta)
 		}
 	}
 }

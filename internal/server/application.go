@@ -62,7 +62,7 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	logger.Log.Info("start restore data from file" + conf.FileStoragePath)
 	file, err := os.OpenFile(conf.FileStoragePath, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		return
+		panic(err)
 	}
 	scanner := bufio.NewScanner(file)
 	if !scanner.Scan() {
@@ -93,9 +93,15 @@ func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 		if err != nil {
 			return
 		}
-		if _, err := file.Write([]byte(metricsJSON)); err != nil {
+
+		n, err := file.Write([]byte(metricsJSON))
+		if err != nil {
 			panic(err)
 		}
+		if n < len(metricsJSON) {
+			return
+		}
+
 		if err := file.Close(); err != nil {
 			panic(err)
 		}
