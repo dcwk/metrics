@@ -21,19 +21,19 @@ func Run(conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
-	storage := storage.NewStorage()
+	stor := storage.NewStorage()
 	if conf.Restore {
-		restore(storage, conf)
+		restore(stor, conf)
 	}
 
 	go func() {
 		logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-		if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(stor)); err != nil {
 			panic(err)
 		}
 	}()
 
-	flush(storage, conf)
+	flush(stor, conf)
 }
 
 func Router(storage storage.DataKeeper) chi.Router {
@@ -69,6 +69,9 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 		return
 	}
 	data := scanner.Bytes()
+
+	logger.Log.Info("file data: " + string(data))
+
 	metricsList := models.MetricsList{}
 	if err := easyjson.Unmarshal(data, &metricsList); err != nil {
 		panic(err)
