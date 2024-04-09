@@ -128,3 +128,22 @@ func TestGetMetrics(t *testing.T) {
 		assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64},{"id":"test","type":"counter","delta":10}]}`)
 	})
 }
+
+func testCanSaveMetricsList(t *testing.T) {
+	t.Run("test can get json metrics", func(t *testing.T) {
+
+		storage := NewStorage()
+		value := float64(10.64)
+		delta := int64(10)
+		gauge := models.Metrics{ID: "test", MType: models.Gauge, Value: &value}
+		counter := models.Metrics{ID: "test", MType: models.Counter, Delta: &delta}
+		list := models.MetricsList{
+			List: []models.Metrics{gauge, counter},
+		}
+
+		storage.SaveMetricsList(&list)
+
+		metricsList, _ := storage.GetJSONMetrics()
+		assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64},{"id":"test","type":"counter","delta":10}]}`)
+	})
+}
