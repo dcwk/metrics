@@ -31,11 +31,11 @@ func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	default:
 		return
 	case models.Gauge:
-		if err := h.Storage.AddGauge(metrics.ID, metrics.Value); err != nil {
+		if err := h.Storage.AddGauge(metrics.ID, *metrics.Value); err != nil {
 			return
 		}
 	case models.Counter:
-		if err := h.Storage.AddCounter(metrics.ID, metrics.Delta); err != nil {
+		if err := h.Storage.AddCounter(metrics.ID, *metrics.Delta); err != nil {
 			return
 		}
 	}

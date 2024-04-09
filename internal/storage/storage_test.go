@@ -32,7 +32,7 @@ func TestGauge(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			for k, v := range test.data {
-				err := storage.AddGauge(k, &v)
+				err := storage.AddGauge(k, v)
 				assert.NoError(t, err)
 			}
 
@@ -73,7 +73,7 @@ func TestCounter(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			for k, v := range test.data {
-				err := storage.AddCounter(k, &v)
+				err := storage.AddCounter(k, v)
 				assert.NoError(t, err)
 			}
 
@@ -116,10 +116,10 @@ func TestGetMetrics(t *testing.T) {
 	t.Run("test can get json metrics", func(t *testing.T) {
 		for _, test := range dataProvider {
 			if test.data.MType == models.Gauge {
-				err := storage.AddGauge(test.data.ID, test.data.Value)
+				err := storage.AddGauge(test.data.ID, *test.data.Value)
 				assert.NoError(t, err)
 			} else {
-				err := storage.AddCounter(test.data.ID, test.data.Delta)
+				err := storage.AddCounter(test.data.ID, *test.data.Delta)
 				assert.NoError(t, err)
 			}
 		}

@@ -9,10 +9,10 @@ import (
 )
 
 type DataKeeper interface {
-	AddGauge(name string, value *float64) error
+	AddGauge(name string, value float64) error
 	GetGauge(name string, allowZeroVal bool) (float64, error)
 	GetAllGauges() map[string]float64
-	AddCounter(name string, value *int64) error
+	AddCounter(name string, value int64) error
 	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
 	GetJSONMetrics() (string, error)
@@ -41,11 +41,11 @@ func NewStorage() *MemStorage {
 	}
 }
 
-func (ms *MemStorage) AddGauge(name string, value *float64) error {
+func (ms *MemStorage) AddGauge(name string, value float64) error {
 	ms.gaugeMx.Lock()
 	defer ms.gaugeMx.Unlock()
 
-	ms.gauge[name] = *value
+	ms.gauge[name] = value
 
 	return nil
 }
@@ -68,11 +68,11 @@ func (ms *MemStorage) GetAllGauges() map[string]float64 {
 	return ms.gauge
 }
 
-func (ms *MemStorage) AddCounter(name string, value *int64) error {
+func (ms *MemStorage) AddCounter(name string, value int64) error {
 	ms.counterMx.Lock()
 	defer ms.counterMx.Unlock()
 
-	ms.counter[name] += *value
+	ms.counter[name] += value
 
 	return nil
 }
@@ -126,11 +126,11 @@ func (ms *MemStorage) GetJSONMetrics() (string, error) {
 func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
 	for _, v := range metricsList.List {
 		if v.MType == models.Gauge {
-			_ = ms.AddGauge(v.ID, v.Value)
+			_ = ms.AddGauge(v.ID, *v.Value)
 		}
 
 		if v.MType == models.Counter {
-			_ = ms.AddCounter(v.ID, v.Delta)
+			_ = ms.AddCounter(v.ID, *v.Delta)
 		}
 	}
 }

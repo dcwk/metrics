@@ -22,11 +22,11 @@ func (ms *MetricsService) UpdateMetrics(metrics *models.Metrics) error {
 	default:
 		return errors.New("type doesn't support")
 	case models.Gauge:
-		if err := ms.storage.AddGauge(metrics.ID, metrics.Value); err != nil {
+		if err := ms.storage.AddGauge(metrics.ID, *metrics.Value); err != nil {
 			return err
 		}
 	case models.Counter:
-		if err := ms.storage.AddCounter(metrics.ID, metrics.Delta); err != nil {
+		if err := ms.storage.AddCounter(metrics.ID, *metrics.Delta); err != nil {
 			return err
 		}
 	}
