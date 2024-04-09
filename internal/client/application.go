@@ -47,8 +47,7 @@ func reportMetrics(ctx context.Context, wg *sync.WaitGroup, conf *config.ClientC
 			return
 		case <-reportTicker.C:
 			time.Sleep(time.Duration(conf.ReportInterval) * time.Second)
-			if err := h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount); err != nil {
-			}
+			_ = h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount)
 		}
 	}
 }
