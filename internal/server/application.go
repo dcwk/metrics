@@ -2,7 +2,6 @@ package server
 
 import (
 	"bufio"
-	"context"
 	"net/http"
 	"os"
 	"time"
@@ -18,23 +17,23 @@ import (
 	"go.uber.org/zap"
 )
 
-func Run(ctx context.Context, conf *config.ServerConf) {
+func Run(conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
-	stor := storage.NewStorage()
+	storage := storage.NewStorage()
 	if conf.Restore {
-		restore(stor, conf)
+		restore(storage, conf)
 	}
 
 	go func() {
 		logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-		if err := http.ListenAndServe(conf.ServerAddr, Router(stor)); err != nil {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
 			panic(err)
 		}
 	}()
 
-	flush(ctx, stor, conf)
+	flush(storage, conf)
 }
 
 func Router(storage storage.DataKeeper) chi.Router {
@@ -63,16 +62,13 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	logger.Log.Info("start restore data from file" + conf.FileStoragePath)
 	file, err := os.OpenFile(conf.FileStoragePath, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		panic(err)
+		return
 	}
 	scanner := bufio.NewScanner(file)
 	if !scanner.Scan() {
 		return
 	}
 	data := scanner.Bytes()
-
-	logger.Log.Info("file data: " + string(data))
-
 	metricsList := models.MetricsList{}
 	if err := easyjson.Unmarshal(data, &metricsList); err != nil {
 		panic(err)
@@ -81,43 +77,29 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	storage.SaveMetricsList(&metricsList)
 }
 
-func flush(ctx context.Context, storage storage.DataKeeper, conf *config.ServerConf) {
+func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
 	}
-	duration := time.Duration(conf.StoreInterval) * time.Second
-	if conf.StoreInterval == 0 {
-		duration = time.Duration(100) * time.Millisecond
-	}
 
-	timer := time.NewTicker(duration)
 	for {
-		select {
-		case <-ctx.Done():
+		logger.Log.Info("start flush data to file " + conf.FileStoragePath)
+		metricsJSON, err := storage.GetJSONMetrics()
+		if err != nil {
 			return
-		case <-timer.C:
-			logger.Log.Info("start flush data to file " + conf.FileStoragePath)
-			metricsJSON, err := storage.GetJSONMetrics()
-			if err != nil {
-				return
-			}
-
-			file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-			if err != nil {
-				return
-			}
-
-			n, err := file.Write([]byte(metricsJSON))
-			if err != nil {
-				panic(err)
-			}
-			if n < len(metricsJSON) {
-				return
-			}
-
-			if err := file.Close(); err != nil {
-				panic(err)
-			}
 		}
+
+		file, err := os.OpenFile(conf.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			return
+		}
+		if _, err := file.Write([]byte(metricsJSON)); err != nil {
+			panic(err)
+		}
+		if err := file.Close(); err != nil {
+			panic(err)
+		}
+
+		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }

@@ -21,7 +21,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.LogLevel, "l", "debug", "log level")
 	flag.Int64Var(&conf.StoreInterval, "i", 300, "store interval")
 	flag.StringVar(&conf.FileStoragePath, "f", "/tmp/metrics-db.json", "file storage path")
-	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
+	flag.BoolVar(&conf.Restore, "r", false, "load exist data at server start")
 	flag.Parse()
 
 	err := env.Parse(conf)
