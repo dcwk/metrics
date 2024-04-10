@@ -59,7 +59,7 @@ func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) 
 	}
 
 	val, ok := ms.gauge[name]
-	if ok != true {
+	if !ok {
 		return 0, errors.New("failed to get metric")
 	}
 
@@ -91,7 +91,7 @@ func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) 
 	}
 
 	val, ok := ms.counter[name]
-	if ok != true {
+	if !ok {
 		return 0, errors.New("failed to get metric")
 	}
 
