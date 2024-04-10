@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
@@ -97,5 +98,7 @@ func flush(storage storage.DataKeeper, conf *config.ServerConf) {
 		if err := file.Close(); err != nil {
 			panic(err)
 		}
+
+		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
 }
