@@ -58,7 +58,12 @@ func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) 
 		return 0, errors.New("gauge not found")
 	}
 
-	return ms.gauge[name], nil
+	val, ok := ms.gauge[name]
+	if ok != true {
+		return 0, errors.New("failed to get metric")
+	}
+
+	return val, nil
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
@@ -85,7 +90,12 @@ func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) 
 		return 0, errors.New("counter not found")
 	}
 
-	return ms.counter[name], nil
+	val, ok := ms.counter[name]
+	if ok != true {
+		return 0, errors.New("failed to get metric")
+	}
+
+	return val, nil
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
