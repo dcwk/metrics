@@ -21,19 +21,18 @@ func Run(conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
-	storage := storage.NewStorage()
+	stor := storage.NewStorage()
 	if conf.Restore {
-		restore(storage, conf)
+		restore(stor, conf)
 	}
 
-	go func() {
-		logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-		if err := http.ListenAndServe(conf.ServerAddr, Router(storage)); err != nil {
-			panic(err)
-		}
-	}()
+	go flush(stor, conf)
 
-	flush(storage, conf)
+	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
+	if err := http.ListenAndServe(conf.ServerAddr, Router(stor)); err != nil {
+		panic(err)
+	}
+
 }
 
 func Router(storage storage.DataKeeper) chi.Router {
