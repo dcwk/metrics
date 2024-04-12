@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+
+	"github.com/dcwk/metrics/internal/server"
+	"github.com/dcwk/metrics/internal/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
@@ -29,7 +32,8 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.
 }
 
 func TestUpdateMetrics(t *testing.T) {
-	ts := httptest.NewServer(Router())
+	s := storage.NewStorage()
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -109,7 +113,8 @@ func TestUpdateMetrics(t *testing.T) {
 }
 
 func TestGetMetrics(t *testing.T) {
-	ts := httptest.NewServer(Router())
+	s := storage.NewStorage()
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))

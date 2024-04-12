@@ -1,11 +1,13 @@
 package storage
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGauge(t *testing.T) {
+	storage := NewStorage()
 	tests := []struct {
 		name string
 		data map[string]string
@@ -28,7 +30,6 @@ func TestGauge(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			storage := GetStorage()
 			for k, v := range test.data {
 				err := storage.AddGauge(k, v)
 				assert.NoError(t, err)
@@ -47,6 +48,7 @@ func TestGauge(t *testing.T) {
 }
 
 func TestCounter(t *testing.T) {
+	storage := NewStorage()
 	tests := []struct {
 		name string
 		data map[string]string
@@ -69,7 +71,6 @@ func TestCounter(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			storage := GetStorage()
 			for k, v := range test.data {
 				err := storage.AddCounter(k, v)
 				assert.NoError(t, err)
