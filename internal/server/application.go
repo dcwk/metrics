@@ -37,22 +37,25 @@ func Run(conf *config.ServerConf) {
 	go flush(stor, conf)
 
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-	if err := http.ListenAndServe(conf.ServerAddr, Router(stor)); err != nil {
+	if err := http.ListenAndServe(conf.ServerAddr, Router(stor, db)); err != nil {
 		panic(err)
 	}
 
 }
 
-func Router(storage storage.DataKeeper) chi.Router {
+func Router(storage storage.DataKeeper, db *sql.DB) chi.Router {
 	r := chi.NewRouter()
+
 	r.Use(logger.RequestLogger)
 	r.Use(utils.GzipMiddleware)
 
 	h := handlers.Handlers{
 		Storage: storage,
+		DB:      db,
 	}
 
 	r.Get("/", h.GetAllMetrics)
+	r.Get("/ping", h.Ping)
 	r.Get("/value/{type}/{name}", h.GetMetricByParams)
 	r.Post("/value/", h.GetMetricByJSON)
 	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)

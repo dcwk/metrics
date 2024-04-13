@@ -20,7 +20,7 @@ func NewServerConf() (*ServerConf, error) {
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "address and port to run server")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
-	flag.StringVar(&conf.DatabaseDSN, "d", "info", "setup database dsn connection settings")
+	flag.StringVar(&conf.DatabaseDSN, "d", "host=localhost user=video password=video dbname=video sslmode=disable", "setup database dsn connection settings")
 	flag.Int64Var(&conf.StoreInterval, "i", 300, "store interval")
 	flag.StringVar(&conf.FileStoragePath, "f", "/tmp/metrics-db.json", "file storage path")
 	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
