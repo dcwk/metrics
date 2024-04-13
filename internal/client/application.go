@@ -16,7 +16,6 @@ func Run(ctx context.Context, conf *config.ClientConf) error {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		return err
 	}
-	time.Sleep(time.Second)
 	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
