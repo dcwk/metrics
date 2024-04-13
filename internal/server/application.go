@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"database/sql"
 	"net/http"
 	"os"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/dcwk/metrics/internal/utils"
 	"github.com/go-chi/chi/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mailru/easyjson"
 	"go.uber.org/zap"
 )
@@ -25,6 +27,12 @@ func Run(conf *config.ServerConf) {
 	if conf.Restore {
 		restore(stor, conf)
 	}
+
+	db, err := sql.Open("pgx", conf.DatabaseDSN)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 
 	go flush(stor, conf)
 
