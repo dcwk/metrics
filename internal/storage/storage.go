@@ -15,6 +15,9 @@ type DataKeeper interface {
 	AddCounter(name string, value int64) error
 	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
+}
+
+type MemoryKeeper interface {
 	GetJSONMetrics() (string, error)
 	SaveMetricsList(metricsList *models.MetricsList)
 }
