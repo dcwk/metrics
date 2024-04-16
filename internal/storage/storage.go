@@ -20,12 +20,12 @@ type DataKeeper interface {
 }
 
 type Gauge struct {
-	gaugeMx sync.RWMutex
+	gaugeMx sync.Mutex
 	gauge   map[string]float64
 }
 
 type Counter struct {
-	counterMx sync.RWMutex
+	counterMx sync.Mutex
 	counter   map[string]int64
 }
 
@@ -51,8 +51,8 @@ func (ms *MemStorage) AddGauge(name string, value float64) error {
 }
 
 func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
-	ms.gaugeMx.RLock()
-	defer ms.gaugeMx.RUnlock()
+	ms.gaugeMx.Lock()
+	defer ms.gaugeMx.Unlock()
 
 	if ms.gauge[name] == 0 && !allowZeroVal {
 		return 0, errors.New("gauge not found")
@@ -67,8 +67,8 @@ func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) 
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
-	ms.gaugeMx.RLock()
-	defer ms.gaugeMx.RUnlock()
+	ms.gaugeMx.Lock()
+	defer ms.gaugeMx.Unlock()
 
 	return ms.gauge
 }
@@ -83,8 +83,8 @@ func (ms *MemStorage) AddCounter(name string, value int64) error {
 }
 
 func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
-	ms.counterMx.RLock()
-	defer ms.counterMx.RUnlock()
+	ms.counterMx.Lock()
+	defer ms.counterMx.Unlock()
 
 	if ms.counter[name] == 0 && !allowZeroVal {
 		return 0, errors.New("counter not found")
@@ -99,8 +99,8 @@ func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) 
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
-	ms.counterMx.RLock()
-	defer ms.counterMx.RUnlock()
+	ms.counterMx.Lock()
+	defer ms.counterMx.Unlock()
 
 	return ms.counter
 }
