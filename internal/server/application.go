@@ -35,7 +35,7 @@ func Run(conf *config.ServerConf) {
 		}
 		defer db.Close()
 
-		dbStorage, err = storage.NewDbStorage(db)
+		dbStorage, err = storage.NewDBStorage(db)
 		if err != nil {
 			panic(err)
 		}

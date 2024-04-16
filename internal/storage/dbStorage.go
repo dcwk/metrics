@@ -11,7 +11,7 @@ type DatabaseStorage struct {
 	mu sync.Mutex
 }
 
-func NewDbStorage(db *sql.DB) (*DatabaseStorage, error) {
+func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs := &DatabaseStorage{
 		DB: db,
 		mu: sync.Mutex{},
