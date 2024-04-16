@@ -16,6 +16,7 @@ type DataKeeper interface {
 	AddCounter(name string, value int64) error
 	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
+	AddMetricsAtBatchMode(metricsList *models.MetricsList) error
 	Ping(ctx context.Context) error
 }
 
@@ -128,6 +129,11 @@ func (ms *MemStorage) GetJSONMetrics() (string, error) {
 	}
 
 	return string(metricsListJSON), nil
+}
+
+func (ms *MemStorage) AddMetricsAtBatchMode(metricsList *models.MetricsList) error {
+	ms.SaveMetricsList(metricsList)
+	return nil
 }
 
 func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {

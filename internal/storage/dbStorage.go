@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"sync"
+
+	"github.com/dcwk/metrics/internal/models"
 )
 
 type DatabaseStorage struct {
@@ -90,6 +92,29 @@ func (dbs *DatabaseStorage) GetCounter(name string, allowZeroVal bool) (int64, e
 func (dbs *DatabaseStorage) GetAllCounters() map[string]int64 {
 	counters := make(map[string]int64)
 	return counters
+}
+
+func (dbs *DatabaseStorage) AddMetricsAtBatchMode(metricsList *models.MetricsList) error {
+	tx, err := dbs.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range metricsList.List {
+		if v.MType == models.Gauge {
+			if err := dbs.AddGauge(v.ID, *v.Value); err != nil {
+				return tx.Rollback()
+			}
+		}
+
+		if v.MType == models.Counter {
+			if err := dbs.AddCounter(v.ID, *v.Delta); err != nil {
+				return tx.Rollback()
+			}
+		}
+	}
+
+	return tx.Commit()
 }
 
 func (dbs *DatabaseStorage) Ping(ctx context.Context) error {
