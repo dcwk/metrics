@@ -19,14 +19,6 @@ type DataKeeper interface {
 	SaveMetricsList(metricsList *models.MetricsList)
 }
 
-type Gauge struct {
-	gaugeMx sync.Mutex
-}
-
-type Counter struct {
-	counterMx sync.Mutex
-}
-
 type MemStorage struct {
 	mu      sync.Mutex
 	gauge   map[string]float64
