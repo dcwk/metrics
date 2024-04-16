@@ -15,6 +15,7 @@ func (h *Handlers) Ping(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Log.Info(fmt.Sprintf("can't connect to db: %s", err.Error()))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 
