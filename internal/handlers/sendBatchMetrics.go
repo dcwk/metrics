@@ -13,10 +13,11 @@ func (h *Handlers) SendBatchMetrics(metrics map[string]float64, addr string, pol
 	metricsList := models.MetricsList{}
 
 	for k, v := range metrics {
+		value := v
 		metric := models.Metrics{
 			ID:    k,
 			MType: models.Gauge,
-			Value: &v,
+			Value: &value,
 		}
 
 		metricsList.List = append(metricsList.List, metric)

@@ -38,7 +38,11 @@ func (dbs *DatabaseStorage) AddGauge(name string, value float64) error {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("INSERT INTO gauges (id, value) VALUES ($1, $2)", name, value)
+	_, err := dbs.DB.Exec(
+		"INSERT INTO gauges (id, value) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET value=$2",
+		name,
+		value,
+	)
 	if err != nil {
 		return err
 	}
@@ -68,7 +72,11 @@ func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("INSERT INTO counters (id, delta) VALUES ($1, $2)", name, value)
+	_, err := dbs.DB.Exec(
+		"INSERT INTO counters as c (id, delta) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET delta=c.delta + $2",
+		name,
+		value,
+	)
 	if err != nil {
 		return err
 	}
