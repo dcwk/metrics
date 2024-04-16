@@ -30,11 +30,6 @@ func (h *Handlers) UpdateBatchMetricByJSON(w http.ResponseWriter, r *http.Reques
 	metricsList := &models.MetricsList{
 		List: metricsData,
 	}
-	if err != nil {
-		logger.Log.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
 	if err := h.Storage.AddMetricsAtBatchMode(metricsList); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
