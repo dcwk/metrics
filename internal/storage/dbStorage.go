@@ -22,35 +22,43 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	tx, err := dbs.DB.Begin()
+	//tx, err := dbs.DB.Begin()
+	//if err != nil {
+	//	return nil, err
+	//}
+	_, err := dbs.DB.Exec(
+		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
+	)
 	if err != nil {
 		return nil, err
 	}
 	_, err = dbs.DB.Exec(
-		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
+		"ALTER TABLE public.gauges DROP CONSTRAINT IF EXISTS gauges_un",
 	)
 	if err != nil {
-		return nil, tx.Rollback()
+		return nil, err
 	}
 	_, err = dbs.DB.Exec(
 		"ALTER TABLE public.gauges ADD CONSTRAINT gauges_un UNIQUE (id)",
 	)
 	if err != nil {
-		return nil, tx.Rollback()
+		return nil, err
 	}
 	_, err = dbs.DB.Exec(
 		"CREATE TABLE IF NOT EXISTS public.counters (id varchar NOT NULL,delta int NOT NULL)",
 	)
 	if err != nil {
-		return nil, tx.Rollback()
+		return nil, err
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.counters DROP CONSTRAINT IF EXISTS counters_un",
+	)
+	if err != nil {
+		return nil, err
 	}
 	_, err = dbs.DB.Exec(
 		"ALTER TABLE public.counters ADD CONSTRAINT counters_un UNIQUE (id)",
 	)
-	if err != nil {
-		return nil, tx.Rollback()
-	}
-	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +82,7 @@ func (dbs *DatabaseStorage) AddGauge(name string, value float64) error {
 	return nil
 }
 
-func (dbs *DatabaseStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
+func (dbs *DatabaseStorage) GetGauge(name string) (float64, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 	var gaugeValue float64
@@ -108,7 +116,7 @@ func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
 	return nil
 }
 
-func (dbs *DatabaseStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
+func (dbs *DatabaseStorage) GetCounter(name string) (int64, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 	var delta int64

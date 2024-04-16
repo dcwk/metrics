@@ -11,10 +11,10 @@ import (
 
 type DataKeeper interface {
 	AddGauge(name string, value float64) error
-	GetGauge(name string, allowZeroVal bool) (float64, error)
+	GetGauge(name string) (float64, error)
 	GetAllGauges() map[string]float64
 	AddCounter(name string, value int64) error
-	GetCounter(name string, allowZeroVal bool) (int64, error)
+	GetCounter(name string) (int64, error)
 	GetAllCounters() map[string]int64
 	AddMetricsAtBatchMode(metricsList *models.MetricsList) error
 	Ping(ctx context.Context) error
@@ -48,11 +48,11 @@ func (ms *MemStorage) AddGauge(name string, value float64) error {
 	return nil
 }
 
-func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
+func (ms *MemStorage) GetGauge(name string) (float64, error) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
-	if ms.gauge[name] == 0 && !allowZeroVal {
+	if ms.gauge[name] == 0 {
 		return 0, errors.New("gauge not found")
 	}
 
@@ -80,11 +80,11 @@ func (ms *MemStorage) AddCounter(name string, value int64) error {
 	return nil
 }
 
-func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
+func (ms *MemStorage) GetCounter(name string) (int64, error) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
-	if ms.counter[name] == 0 && !allowZeroVal {
+	if ms.counter[name] == 0 {
 		return 0, errors.New("counter not found")
 	}
 

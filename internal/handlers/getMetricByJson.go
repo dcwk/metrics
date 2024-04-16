@@ -31,7 +31,7 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	default:
 		return
 	case models.Gauge:
-		metricValue, err := h.Storage.GetGauge(metrics.ID, false)
+		metricValue, err := h.Storage.GetGauge(metrics.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -39,7 +39,7 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 
 		metrics.Value = &metricValue
 	case models.Counter:
-		metricValue, err := h.Storage.GetCounter(metrics.ID, false)
+		metricValue, err := h.Storage.GetCounter(metrics.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
