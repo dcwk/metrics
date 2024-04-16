@@ -21,29 +21,29 @@ type DataKeeper interface {
 
 type Gauge struct {
 	gaugeMx sync.Mutex
-	gauge   map[string]float64
 }
 
 type Counter struct {
 	counterMx sync.Mutex
-	counter   map[string]int64
 }
 
 type MemStorage struct {
-	Gauge
-	Counter
+	mu      sync.Mutex
+	gauge   map[string]float64
+	counter map[string]int64
 }
 
 func NewStorage() *MemStorage {
 	return &MemStorage{
-		Gauge{gauge: make(map[string]float64, 1000)},
-		Counter{counter: make(map[string]int64, 1000)},
+		mu:      sync.Mutex{},
+		gauge:   make(map[string]float64, 1000),
+		counter: make(map[string]int64, 1000),
 	}
 }
 
 func (ms *MemStorage) AddGauge(name string, value float64) error {
-	ms.gaugeMx.Lock()
-	defer ms.gaugeMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	ms.gauge[name] = value
 
@@ -51,8 +51,8 @@ func (ms *MemStorage) AddGauge(name string, value float64) error {
 }
 
 func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
-	ms.gaugeMx.Lock()
-	defer ms.gaugeMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	if ms.gauge[name] == 0 && !allowZeroVal {
 		return 0, errors.New("gauge not found")
@@ -67,15 +67,15 @@ func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) 
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
-	ms.gaugeMx.Lock()
-	defer ms.gaugeMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	return ms.gauge
 }
 
 func (ms *MemStorage) AddCounter(name string, value int64) error {
-	ms.counterMx.Lock()
-	defer ms.counterMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	ms.counter[name] += value
 
@@ -83,8 +83,8 @@ func (ms *MemStorage) AddCounter(name string, value int64) error {
 }
 
 func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
-	ms.counterMx.Lock()
-	defer ms.counterMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	if ms.counter[name] == 0 && !allowZeroVal {
 		return 0, errors.New("counter not found")
@@ -99,8 +99,8 @@ func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) 
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
-	ms.counterMx.Lock()
-	defer ms.counterMx.Unlock()
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
 
 	return ms.counter
 }
