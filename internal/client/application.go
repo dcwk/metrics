@@ -45,7 +45,7 @@ func reportMetrics(ctx context.Context, wg *sync.WaitGroup, conf *config.ClientC
 			wg.Done()
 			return
 		case <-reportTicker.C:
-			_ = h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount)
+			_ = h.SendBatchMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount)
 		}
 	}
 }
