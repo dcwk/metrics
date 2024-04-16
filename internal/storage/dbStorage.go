@@ -22,11 +22,35 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("CREATE TABLE IF NOT EXISTS public.gauges (id varchar NULL,value double precision NULL)")
+	tx, err := dbs.DB.Begin()
 	if err != nil {
 		return nil, err
 	}
-	_, err = dbs.DB.Exec("CREATE TABLE IF NOT EXISTS public.counters (id varchar NULL,delta int NULL)")
+	_, err = dbs.DB.Exec(
+		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
+	)
+	if err != nil {
+		return nil, tx.Rollback()
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.gauges ADD CONSTRAINT gauges_un UNIQUE (id)",
+	)
+	if err != nil {
+		return nil, tx.Rollback()
+	}
+	_, err = dbs.DB.Exec(
+		"CREATE TABLE IF NOT EXISTS public.counters (id varchar NOT NULL,delta int NOT NULL)",
+	)
+	if err != nil {
+		return nil, tx.Rollback()
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.counters ADD CONSTRAINT counters_un UNIQUE (id)",
+	)
+	if err != nil {
+		return nil, tx.Rollback()
+	}
+	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +97,7 @@ func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
 	defer dbs.mu.Unlock()
 
 	_, err := dbs.DB.Exec(
-		"INSERT INTO counters as c (id, delta) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET delta=c.delta + $2",
+		"INSERT INTO counters AS c (id, delta) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET delta=c.delta + $2",
 		name,
 		value,
 	)
