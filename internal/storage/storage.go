@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"errors"
 	"sync"
 
@@ -15,6 +16,7 @@ type DataKeeper interface {
 	AddCounter(name string, value int64) error
 	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
+	Ping(ctx context.Context) error
 }
 
 type MemoryKeeper interface {
@@ -138,4 +140,12 @@ func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
 			_ = ms.AddCounter(v.ID, *v.Delta)
 		}
 	}
+}
+
+func (ms *MemStorage) Ping(ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("context doesn't exists")
+	}
+
+	return nil
 }
