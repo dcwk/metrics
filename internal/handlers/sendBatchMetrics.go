@@ -8,7 +8,7 @@ import (
 	"github.com/dcwk/metrics/internal/models"
 )
 
-func (h *Handlers) SendBatchMetrics(metrics map[string]float64, addr string, pollCount *int64) error {
+func (h *Handlers) SendBatchMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
 	path := fmt.Sprintf("http://%s/updates/", addr)
 	metricsList := models.MetricsList{}
 
@@ -36,7 +36,7 @@ func (h *Handlers) SendBatchMetrics(metrics map[string]float64, addr string, pol
 		return err
 	}
 
-	if err := send(jsonData, path); err != nil {
+	if err := send(jsonData, path, hashKey); err != nil {
 		return err
 	}
 	log.Printf("reported metrics in JSON %s\n", string(jsonData))

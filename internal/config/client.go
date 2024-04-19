@@ -11,6 +11,7 @@ type ClientConf struct {
 	ReportInterval int64  `env:"REPORT_INTERVAL"`
 	PollInterval   int64  `env:"POLL_INTERVAL"`
 	LogLevel       string `env:"LOG_LEVEL"`
+	HashKey        string `env:"KEY"`
 }
 
 func NewClientConf() (*ClientConf, error) {
@@ -20,6 +21,7 @@ func NewClientConf() (*ClientConf, error) {
 	flag.Int64Var(&conf.ReportInterval, "r", 10, "sending frequency interval")
 	flag.Int64Var(&conf.PollInterval, "p", 2, "metrics reading frequency")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
+	flag.StringVar(&conf.HashKey, "k", "test", "hash key")
 	flag.Parse()
 
 	err := env.Parse(conf)
