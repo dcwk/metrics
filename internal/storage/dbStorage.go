@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"os"
 	"sync"
 
 	"github.com/dcwk/metrics/internal/logger"
@@ -24,7 +25,12 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	if err := goose.Up(db, "../../migrations"); err != nil {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	pwd = pwd + "/../../migrations"
+	if err := goose.Up(db, pwd); err != nil {
 		logger.Log.Error("Can't apply migrations")
 		return nil, err
 	}
