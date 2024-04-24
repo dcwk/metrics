@@ -34,8 +34,8 @@ type MemStorage struct {
 func NewStorage() *MemStorage {
 	return &MemStorage{
 		mu:      sync.Mutex{},
-		gauge:   make(map[string]float64, 1000),
-		counter: make(map[string]int64, 1000),
+		gauge:   make(map[string]float64, 0),
+		counter: make(map[string]int64, 0),
 	}
 }
 
