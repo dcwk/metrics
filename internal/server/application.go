@@ -48,9 +48,9 @@ func Run(conf *config.ServerConf) {
 		//
 		//	break
 		//}
-		if err != nil {
-			panic(err)
-		}
+		//if err != nil {
+		//	panic(err)
+		//}
 
 		dbStorage, err = storage.NewDBStorage(db)
 		if err != nil {
