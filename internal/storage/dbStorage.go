@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"log"
 	"os"
 	"sync"
 
@@ -29,7 +30,15 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	if err != nil {
 		return nil, err
 	}
-	pwd = pwd + "/migrations"
+	entries, err := os.ReadDir(pwd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, e := range entries {
+		logger.Log.Info(e.Name())
+	}
+	pwd = pwd + "/../../migrations"
 	if err := goose.Up(db, pwd); err != nil {
 		logger.Log.Error("Can't apply migrations")
 		return nil, err
