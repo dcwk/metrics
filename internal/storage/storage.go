@@ -147,3 +147,7 @@ func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
 		}
 	}
 }
+
+func (ms *MemStorage) Ping(ctx context.Context) error {
+	return nil
+}
