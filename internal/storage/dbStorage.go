@@ -62,8 +62,27 @@ func (dbs *DatabaseStorage) GetGauge(name string) (float64, error) {
 }
 
 func (dbs *DatabaseStorage) GetAllGauges() map[string]float64 {
-	gauges := make(map[string]float64)
-	return gauges
+	gaugesMap := make(map[string]float64, 0)
+	dbs.mu.Lock()
+	defer dbs.mu.Unlock()
+
+	rows, err := dbs.DB.Query("SELECT id, value FROM gauges")
+	if err != nil {
+		return gaugesMap
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var metrics models.Metrics
+		err := rows.Scan(&metrics.ID, &metrics.Value)
+		if err != nil {
+			return gaugesMap
+		}
+
+		gaugesMap[metrics.ID] = *metrics.Value
+	}
+
+	return gaugesMap
 }
 
 func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
@@ -96,8 +115,27 @@ func (dbs *DatabaseStorage) GetCounter(name string) (int64, error) {
 }
 
 func (dbs *DatabaseStorage) GetAllCounters() map[string]int64 {
-	counters := make(map[string]int64)
-	return counters
+	countersMap := make(map[string]int64, 0)
+	dbs.mu.Lock()
+	defer dbs.mu.Unlock()
+
+	rows, err := dbs.DB.Query("SELECT id, value FROM gauges")
+	if err != nil {
+		return countersMap
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var metrics models.Metrics
+		err := rows.Scan(&metrics.ID, &metrics.Delta)
+		if err != nil {
+			return countersMap
+		}
+
+		countersMap[metrics.ID] = *metrics.Delta
+	}
+
+	return countersMap
 }
 
 func (dbs *DatabaseStorage) AddMetricsAtBatchMode(metricsList *models.MetricsList) error {
