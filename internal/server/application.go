@@ -3,7 +3,6 @@ package server
 import (
 	"bufio"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -30,7 +29,7 @@ func Run(conf *config.ServerConf) {
 	if conf.DatabaseDSN == "" {
 		memStorage = storage.NewStorage()
 	} else {
-		sleepDuration := 1
+		//sleepDuration := 1
 		var err error
 		db, err := sql.Open("pgx", conf.DatabaseDSN)
 		if err != nil {
@@ -38,17 +37,17 @@ func Run(conf *config.ServerConf) {
 		}
 		defer db.Close()
 
-		for i := 0; i < 3; i++ {
-			err = db.Ping()
-			if err != nil {
-				logger.Log.Info(fmt.Sprintf("Can't connect to database sleep %v", sleepDuration))
-				time.Sleep(time.Duration(sleepDuration) * time.Second)
-				sleepDuration += 2
-				continue
-			}
-
-			break
-		}
+		//for i := 0; i < 3; i++ {
+		//	err = db.Ping()
+		//	if err != nil {
+		//		logger.Log.Info(fmt.Sprintf("Can't connect to database sleep %v", sleepDuration))
+		//		time.Sleep(time.Duration(sleepDuration) * time.Second)
+		//		sleepDuration += 2
+		//		continue
+		//	}
+		//
+		//	break
+		//}
 		if err != nil {
 			panic(err)
 		}
