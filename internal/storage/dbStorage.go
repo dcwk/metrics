@@ -82,6 +82,10 @@ func (dbs *DatabaseStorage) GetAllGauges() map[string]float64 {
 		gaugesMap[metrics.ID] = *metrics.Value
 	}
 
+	if err := rows.Err(); err != nil {
+		return gaugesMap
+	}
+
 	return gaugesMap
 }
 
@@ -133,6 +137,10 @@ func (dbs *DatabaseStorage) GetAllCounters() map[string]int64 {
 		}
 
 		countersMap[metrics.ID] = *metrics.Delta
+	}
+
+	if err := rows.Err(); err != nil {
+		return countersMap
 	}
 
 	return countersMap
