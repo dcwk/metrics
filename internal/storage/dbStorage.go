@@ -30,8 +30,12 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 		return nil, err
 	}
 	pwd = pwd + "/migrations"
+	if err := goose.Down(db, pwd); err != nil {
+		logger.Log.Error("Can't migrations down")
+		return nil, err
+	}
 	if err := goose.Up(db, pwd); err != nil {
-		logger.Log.Error("Can't apply migrations")
+		logger.Log.Error("Can't migrations up")
 		return nil, err
 	}
 
