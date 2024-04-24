@@ -29,7 +29,7 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	if err != nil {
 		return nil, err
 	}
-	pwd = pwd + "/../../migrations"
+	pwd = pwd + "/migrations"
 	if err := goose.Up(db, pwd); err != nil {
 		logger.Log.Error("Can't apply migrations")
 		return nil, err
