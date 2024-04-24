@@ -147,11 +147,3 @@ func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
 		}
 	}
 }
-
-func (ms *MemStorage) Ping(ctx context.Context) error {
-	if ctx == nil {
-		return errors.New("context doesn't exists")
-	}
-
-	return nil
-}
