@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"sync"
 
+	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
+	"github.com/pressly/goose"
 )
 
 type DatabaseStorage struct {
@@ -22,44 +24,8 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	//tx, err := dbs.DB.Begin()
-	//if err != nil {
-	//	return nil, err
-	//}
-	_, err := dbs.DB.Exec(
-		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.gauges DROP CONSTRAINT IF EXISTS gauges_un",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.gauges ADD CONSTRAINT gauges_un UNIQUE (id)",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"CREATE TABLE IF NOT EXISTS public.counters (id varchar NOT NULL,delta int NOT NULL)",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.counters DROP CONSTRAINT IF EXISTS counters_un",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.counters ADD CONSTRAINT counters_un UNIQUE (id)",
-	)
-	if err != nil {
+	if err := goose.Up(db, "../../migrations"); err != nil {
+		logger.Log.Error("Can't apply migrations")
 		return nil, err
 	}
 
