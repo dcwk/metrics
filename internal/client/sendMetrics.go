@@ -1,4 +1,4 @@
-package handlers
+package client
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"github.com/mailru/easyjson"
 )
 
-func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
+func SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
 	path := fmt.Sprintf("http://%s/update/", addr)
 
 	for k, v := range metrics {

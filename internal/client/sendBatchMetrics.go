@@ -1,4 +1,4 @@
-package handlers
+package client
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/dcwk/metrics/internal/models"
 )
 
-func (h *Handlers) SendBatchMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
+func SendBatchMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
 	path := fmt.Sprintf("http://%s/updates/", addr)
 	metricsList := models.MetricsList{}
 

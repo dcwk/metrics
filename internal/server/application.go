@@ -30,7 +30,7 @@ func Run(conf *config.ServerConf) {
 		memStorage = storage.NewStorage()
 	} else {
 		//sleepDuration := 1
-		//var err error
+		var err error
 		db, err := sql.Open("pgx", conf.DatabaseDSN)
 		if err != nil {
 			panic(err)

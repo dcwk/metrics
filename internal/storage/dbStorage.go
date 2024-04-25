@@ -3,9 +3,12 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"os"
 	"sync"
 
+	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
+	"github.com/pressly/goose"
 )
 
 type DatabaseStorage struct {
@@ -22,44 +25,16 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	//tx, err := dbs.DB.Begin()
-	//if err != nil {
-	//	return nil, err
-	//}
-	_, err := dbs.DB.Exec(
-		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
-	)
+	pwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.gauges DROP CONSTRAINT IF EXISTS gauges_un",
-	)
-	if err != nil {
-		return nil, err
+	pwd = pwd + "/migrations"
+	if err := goose.Down(db, pwd); err != nil {
+		logger.Log.Error("Can't migrations down")
 	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.gauges ADD CONSTRAINT gauges_un UNIQUE (id)",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"CREATE TABLE IF NOT EXISTS public.counters (id varchar NOT NULL,delta int NOT NULL)",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.counters DROP CONSTRAINT IF EXISTS counters_un",
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = dbs.DB.Exec(
-		"ALTER TABLE public.counters ADD CONSTRAINT counters_un UNIQUE (id)",
-	)
-	if err != nil {
+	if err := goose.Up(db, pwd); err != nil {
+		logger.Log.Error("Can't migrations up")
 		return nil, err
 	}
 
@@ -96,8 +71,31 @@ func (dbs *DatabaseStorage) GetGauge(name string) (float64, error) {
 }
 
 func (dbs *DatabaseStorage) GetAllGauges() map[string]float64 {
-	gauges := make(map[string]float64)
-	return gauges
+	gaugesMap := make(map[string]float64, 0)
+	dbs.mu.Lock()
+	defer dbs.mu.Unlock()
+
+	rows, err := dbs.DB.Query("SELECT id, value FROM gauges")
+	if err != nil {
+		return gaugesMap
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var metrics models.Metrics
+		err := rows.Scan(&metrics.ID, &metrics.Value)
+		if err != nil {
+			return gaugesMap
+		}
+
+		gaugesMap[metrics.ID] = *metrics.Value
+	}
+
+	if err := rows.Err(); err != nil {
+		return gaugesMap
+	}
+
+	return gaugesMap
 }
 
 func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
@@ -130,8 +128,31 @@ func (dbs *DatabaseStorage) GetCounter(name string) (int64, error) {
 }
 
 func (dbs *DatabaseStorage) GetAllCounters() map[string]int64 {
-	counters := make(map[string]int64)
-	return counters
+	countersMap := make(map[string]int64, 0)
+	dbs.mu.Lock()
+	defer dbs.mu.Unlock()
+
+	rows, err := dbs.DB.Query("SELECT id, value FROM gauges")
+	if err != nil {
+		return countersMap
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var metrics models.Metrics
+		err := rows.Scan(&metrics.ID, &metrics.Delta)
+		if err != nil {
+			return countersMap
+		}
+
+		countersMap[metrics.ID] = *metrics.Delta
+	}
+
+	if err := rows.Err(); err != nil {
+		return countersMap
+	}
+
+	return countersMap
 }
 
 func (dbs *DatabaseStorage) AddMetricsAtBatchMode(metricsList *models.MetricsList) error {
