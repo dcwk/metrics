@@ -62,7 +62,7 @@ func send(metricsJSON []byte, path string, hashKey string) error {
 
 	if hashKey != "" {
 		h := hmac.New(sha256.New, []byte(hashKey))
-		sign = h.Sum(nil)
+		sign = h.Sum(body)
 	}
 
 	client := resty.New()
