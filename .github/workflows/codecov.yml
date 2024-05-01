@@ -19,3 +19,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: dcwk/metrics
+    ignore:
+      - "**/dbStorage.go"

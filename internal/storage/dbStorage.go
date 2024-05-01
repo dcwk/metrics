@@ -21,7 +21,6 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 		DB: db,
 		mu: sync.Mutex{},
 	}
-
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
