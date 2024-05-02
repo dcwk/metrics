@@ -83,6 +83,7 @@ func Router(storage storage.DataKeeper) chi.Router {
 
 	r.Use(logger.RequestLogger)
 	r.Use(utils.GzipMiddleware)
+	r.Use(utils.SignMiddleware)
 
 	h := handlers.Handlers{
 		Storage: storage,
