@@ -16,5 +16,7 @@ func SignMiddleware(next http.Handler) http.Handler {
 		}
 
 		logger.Log.Info(fmt.Sprintf("Sign data: %s", sign))
+
+		next.ServeHTTP(w, r)
 	})
 }
