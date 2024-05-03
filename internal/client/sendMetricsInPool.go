@@ -13,11 +13,10 @@ func SendMetricsInPool(
 	metrics map[string]float64,
 	addr string,
 	hashKey string,
-	rateLimit int64,
+	workerPool *WorkerPool,
 	pollCount *int64,
 ) error {
 	path := fmt.Sprintf("http://%s/update/", addr)
-	workerPool := NewWorkerPool(rateLimit)
 	for k, v := range metrics {
 		metric := models.Metrics{
 			ID:    k,
