@@ -55,14 +55,14 @@ func SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCo
 
 func send(metricsJSON []byte, path string, hashKey string) error {
 	var sign []byte
+	if hashKey != "" {
+		h := hmac.New(sha256.New, []byte(hashKey))
+		sign = h.Sum(metricsJSON)
+	}
+
 	body, err := compress(metricsJSON)
 	if err != nil {
 		return err
-	}
-
-	if hashKey != "" {
-		h := hmac.New(sha256.New, []byte(hashKey))
-		sign = h.Sum(body)
 	}
 
 	client := resty.New()
