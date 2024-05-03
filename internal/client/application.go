@@ -11,7 +11,7 @@ import (
 )
 
 func Run(ctx context.Context, conf *config.ClientConf) error {
-	if err := logger.Initialize(conf.LogLevel); err != nil {
+	if err := logger.Initialize("info"); err != nil {
 		return err
 	}
 	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
@@ -39,7 +39,7 @@ func reportMetrics(ctx context.Context, wg *sync.WaitGroup, conf *config.ClientC
 			wg.Done()
 			return
 		case <-reportTicker.C:
-			_ = SendBatchMetrics(agent.Metrics, conf.ServerAddr, conf.HashKey, &agent.PollCount)
+			_ = SendMetricsInPool(agent.Metrics, conf.ServerAddr, conf.HashKey, conf.RateLimit, &agent.PollCount)
 		}
 	}
 }
