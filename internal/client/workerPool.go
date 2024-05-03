@@ -29,8 +29,6 @@ func (wp *WorkerPool) Produce(job func()) {
 
 func (wp *WorkerPool) Work() {
 	for job := range wp.jobs {
-		logger.Log.Info("worker start new job")
 		job()
 	}
-	logger.Log.Info("worker finished work")
 }
