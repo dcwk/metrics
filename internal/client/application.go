@@ -16,7 +16,6 @@ func Run(ctx context.Context, conf *config.ClientConf) error {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		return err
 	}
-
 	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
@@ -46,7 +45,6 @@ func reportMetrics(ctx context.Context, wg *sync.WaitGroup, conf *config.ClientC
 			wg.Done()
 			return
 		case <-reportTicker.C:
-			time.Sleep(time.Duration(conf.ReportInterval) * time.Second)
 			_ = h.SendMetrics(agent.Metrics, conf.ServerAddr, &agent.PollCount)
 		}
 	}
