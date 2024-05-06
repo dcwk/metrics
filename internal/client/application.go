@@ -17,11 +17,12 @@ func Run(conf *config.ClientConf) error {
 	h := handlers.Handlers{
 		Storage: storage.NewStorage(),
 	}
-	//logger.Log.Info("Sending metrics to" + conf.ServerAddr)
+	logger.Log.Info("Sending metrics to" + conf.ServerAddr)
 
 	for {
-		time.Sleep(time.Duration(conf.PollInterval) * time.Second)
 		if pollCount%(conf.ReportInterval/conf.PollInterval) != 0 {
+			time.Sleep(time.Duration(conf.PollInterval) * time.Second)
+
 			pollCount++
 			continue
 		}

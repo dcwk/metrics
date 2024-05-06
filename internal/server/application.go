@@ -7,6 +7,7 @@ import (
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/storage"
+	"github.com/dcwk/metrics/internal/utils"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
@@ -26,6 +27,7 @@ func Run(conf *config.ServerConf) {
 func Router(s storage.DataKeeper) chi.Router {
 	r := chi.NewRouter()
 	r.Use(logger.RequestLogger)
+	r.Use(utils.GzipMiddleware)
 
 	h := handlers.Handlers{
 		Storage: s,
