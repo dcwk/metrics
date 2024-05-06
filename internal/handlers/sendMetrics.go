@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-func SendMetrics(addr string) error {
+func (h *Handlers) SendMetrics(addr string) error {
 	for k, v := range getGauges() {
 		r := bytes.NewReader([]byte(""))
 		resp, err := http.Post(
