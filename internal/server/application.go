@@ -68,21 +68,22 @@ func Run(conf *config.ServerConf) {
 
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
 	if memStorage != nil {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(memStorage)); err != nil {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(memStorage, conf)); err != nil {
 			panic(err)
 		}
 	} else {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(dbStorage)); err != nil {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(dbStorage, conf)); err != nil {
 			panic(err)
 		}
 	}
 }
 
-func Router(storage storage.DataKeeper) chi.Router {
+func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
 	r.Use(utils.GzipMiddleware)
+	r.Use(utils.SignMiddleware(conf.HashKey))
 
 	h := handlers.Handlers{
 		Storage: storage,

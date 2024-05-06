@@ -13,6 +13,7 @@ type ServerConf struct {
 	FileStoragePath string `env:"FILE_STORAGE_PATH"`
 	Restore         bool   `env:"RESTORE"`
 	DatabaseDSN     string `env:"DATABASE_DSN"`
+	HashKey         string `env:"KEY"`
 }
 
 func NewServerConf() (*ServerConf, error) {
@@ -24,6 +25,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.Int64Var(&conf.StoreInterval, "i", 300, "store interval")
 	flag.StringVar(&conf.FileStoragePath, "f", "/tmp/metrics-db.json", "file storage path")
 	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
+	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
 	flag.Parse()
 
 	err := env.Parse(conf)
