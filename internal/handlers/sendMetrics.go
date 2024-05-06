@@ -12,6 +12,8 @@ import (
 )
 
 func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCount *int64) error {
+	path := fmt.Sprintf("http://%s/update/", addr)
+
 	for k, v := range metrics {
 		metric := models.Metrics{
 			ID:    k,
@@ -24,7 +26,7 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 		}
 		log.Printf("reported metric JSON %s with value %f\n", k, v)
 
-		if err := send(json, addr); err != nil {
+		if err := send(json, path); err != nil {
 			return err
 		}
 	}
@@ -40,14 +42,14 @@ func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCoun
 		return err
 	}
 
-	if err := send(json, addr); err != nil {
+	if err := send(json, path); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func send(metricsJSON []byte, addr string) error {
+func send(metricsJSON []byte, path string) error {
 	body, err := compress(metricsJSON)
 	if err != nil {
 		return err
@@ -61,7 +63,7 @@ func send(metricsJSON []byte, addr string) error {
 			"Content-Encoding": "gzip",
 		}).
 		SetBody(string(body)).
-		Post(fmt.Sprintf("http://%s/update/", addr))
+		Post(path)
 	if err != nil {
 		return err
 	}

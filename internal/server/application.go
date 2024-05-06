@@ -77,6 +77,7 @@ func Router(storage storage.DataKeeper) chi.Router {
 	r.Post("/value/", h.GetMetricByJSON)
 	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
 	r.Post("/update/", h.UpdateMetricByJSON)
+	r.Post("/updates/", h.UpdateBatchMetricByJSON)
 
 	return r
 }

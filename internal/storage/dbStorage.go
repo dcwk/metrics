@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"sync"
+
+	"github.com/dcwk/metrics/internal/models"
 )
 
 type DatabaseStorage struct {
@@ -20,11 +22,43 @@ func NewDBStorage(db *sql.DB) (*DatabaseStorage, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("CREATE TABLE IF NOT EXISTS public.gauges (id varchar NULL,value double precision NULL)")
+	//tx, err := dbs.DB.Begin()
+	//if err != nil {
+	//	return nil, err
+	//}
+	_, err := dbs.DB.Exec(
+		"CREATE TABLE IF NOT EXISTS public.gauges (id varchar NOT NULL,value double precision NOT NULL)",
+	)
 	if err != nil {
 		return nil, err
 	}
-	_, err = dbs.DB.Exec("CREATE TABLE IF NOT EXISTS public.counters (id varchar NULL,delta int NULL)")
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.gauges DROP CONSTRAINT IF EXISTS gauges_un",
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.gauges ADD CONSTRAINT gauges_un UNIQUE (id)",
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = dbs.DB.Exec(
+		"CREATE TABLE IF NOT EXISTS public.counters (id varchar NOT NULL,delta int NOT NULL)",
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.counters DROP CONSTRAINT IF EXISTS counters_un",
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = dbs.DB.Exec(
+		"ALTER TABLE public.counters ADD CONSTRAINT counters_un UNIQUE (id)",
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +70,11 @@ func (dbs *DatabaseStorage) AddGauge(name string, value float64) error {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("INSERT INTO gauges (id, value) VALUES ($1, $2)", name, value)
+	_, err := dbs.DB.Exec(
+		"INSERT INTO gauges (id, value) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET value=$2",
+		name,
+		value,
+	)
 	if err != nil {
 		return err
 	}
@@ -44,7 +82,7 @@ func (dbs *DatabaseStorage) AddGauge(name string, value float64) error {
 	return nil
 }
 
-func (dbs *DatabaseStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
+func (dbs *DatabaseStorage) GetGauge(name string) (float64, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 	var gaugeValue float64
@@ -66,7 +104,11 @@ func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 
-	_, err := dbs.DB.Exec("INSERT INTO counters (id, delta) VALUES ($1, $2)", name, value)
+	_, err := dbs.DB.Exec(
+		"INSERT INTO counters AS c (id, delta) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET delta=c.delta + $2",
+		name,
+		value,
+	)
 	if err != nil {
 		return err
 	}
@@ -74,7 +116,7 @@ func (dbs *DatabaseStorage) AddCounter(name string, value int64) error {
 	return nil
 }
 
-func (dbs *DatabaseStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
+func (dbs *DatabaseStorage) GetCounter(name string) (int64, error) {
 	dbs.mu.Lock()
 	defer dbs.mu.Unlock()
 	var delta int64
@@ -90,6 +132,29 @@ func (dbs *DatabaseStorage) GetCounter(name string, allowZeroVal bool) (int64, e
 func (dbs *DatabaseStorage) GetAllCounters() map[string]int64 {
 	counters := make(map[string]int64)
 	return counters
+}
+
+func (dbs *DatabaseStorage) AddMetricsAtBatchMode(metricsList *models.MetricsList) error {
+	tx, err := dbs.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range metricsList.List {
+		if v.MType == models.Gauge {
+			if err := dbs.AddGauge(v.ID, *v.Value); err != nil {
+				return tx.Rollback()
+			}
+		}
+
+		if v.MType == models.Counter {
+			if err := dbs.AddCounter(v.ID, *v.Delta); err != nil {
+				return tx.Rollback()
+			}
+		}
+	}
+
+	return tx.Commit()
 }
 
 func (dbs *DatabaseStorage) Ping(ctx context.Context) error {
