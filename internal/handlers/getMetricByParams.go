@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-chi/chi/v5"
 )
 
 func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
 	t := chi.URLParam(r, "type")
 	n := chi.URLParam(r, "name")
@@ -18,15 +19,15 @@ func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "", http.StatusBadRequest)
 		return
-	case gauge:
-		metricValue, err := h.Storage.GetGauge(n)
+	case models.Gauge:
+		metricValue, err := h.Storage.GetGauge(n, false)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
 		v = fmt.Sprintf("%v", metricValue)
-	case counter:
-		metricValue, err := h.Storage.GetCounter(n)
+	case models.Counter:
+		metricValue, err := h.Storage.GetCounter(n, false)
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return

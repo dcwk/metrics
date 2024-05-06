@@ -1,39 +1,38 @@
 package handlers
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
-	"math/rand"
-	"runtime"
+	"log"
 
-	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
 )
 
-func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
-	for k, v := range getGauges() {
+func (h *Handlers) SendMetrics(metrics map[string]float64, addr string, pollCount *int64) error {
+	for k, v := range metrics {
 		metric := models.Metrics{
 			ID:    k,
-			MType: gauge,
+			MType: models.Gauge,
 			Value: &v,
 		}
 		json, err := easyjson.Marshal(&metric)
 		if err != nil {
 			return err
 		}
+		log.Printf("reported metric JSON %s with value %f\n", k, v)
 
-		logger.Log.Info(string(json))
-
-		if err := send(string(json), addr); err != nil {
+		if err := send(json, addr); err != nil {
 			return err
 		}
 	}
 
 	metric := models.Metrics{
 		ID:    "PollCount",
-		MType: counter,
-		Delta: &pollCount,
+		MType: models.Counter,
+		Delta: pollCount,
 	}
 
 	json, err := easyjson.Marshal(&metric)
@@ -41,18 +40,27 @@ func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 		return err
 	}
 
-	if err := send(string(json), addr); err != nil {
+	if err := send(json, addr); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func send(metricsJSON string, addr string) error {
+func send(metricsJSON []byte, addr string) error {
+	body, err := compress(metricsJSON)
+	if err != nil {
+		return err
+	}
+
 	client := resty.New()
-	_, err := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(metricsJSON).
+	_, err = client.R().
+		SetHeaders(map[string]string{
+			"Content-Type":     "application/json;charset=UTF-8",
+			"Accept-Encoding":  "gzip",
+			"Content-Encoding": "gzip",
+		}).
+		SetBody(string(body)).
 		Post(fmt.Sprintf("http://%s/update/", addr))
 	if err != nil {
 		return err
@@ -61,38 +69,17 @@ func send(metricsJSON string, addr string) error {
 	return nil
 }
 
-func getGauges() map[string]float64 {
-	gauges := map[string]float64{}
-	ms := runtime.MemStats{}
-	runtime.ReadMemStats(&ms)
-	gauges["Alloc"] = float64(ms.Alloc)
-	gauges["GCCPUFraction"] = float64(ms.GCCPUFraction)
-	gauges["BuckHashSys"] = float64(ms.BuckHashSys)
-	gauges["Frees"] = float64(ms.Frees)
-	gauges["GCSys"] = float64(ms.GCSys)
-	gauges["HeapAlloc"] = float64(ms.HeapAlloc)
-	gauges["HeapIdle"] = float64(ms.HeapIdle)
-	gauges["HeapInuse"] = float64(ms.HeapInuse)
-	gauges["HeapObjects"] = float64(ms.HeapObjects)
-	gauges["HeapReleased"] = float64(ms.HeapReleased)
-	gauges["HeapSys"] = float64(ms.HeapSys)
-	gauges["LastGC"] = float64(ms.LastGC)
-	gauges["Lookups"] = float64(ms.Lookups)
-	gauges["MCacheInuse"] = float64(ms.MCacheInuse)
-	gauges["MCacheSys"] = float64(ms.MCacheSys)
-	gauges["MSpanInuse"] = float64(ms.MSpanInuse)
-	gauges["MSpanSys"] = float64(ms.MSpanSys)
-	gauges["Mallocs"] = float64(ms.Mallocs)
-	gauges["NextGC"] = float64(ms.NextGC)
-	gauges["NumForcedGC"] = float64(ms.NumForcedGC)
-	gauges["NumGC"] = float64(ms.NumGC)
-	gauges["OtherSys"] = float64(ms.OtherSys)
-	gauges["PauseTotalNs"] = float64(ms.PauseTotalNs)
-	gauges["StackInuse"] = float64(ms.StackInuse)
-	gauges["StackSys"] = float64(ms.StackSys)
-	gauges["Sys"] = float64(ms.Sys)
-	gauges["TotalAlloc"] = float64(ms.TotalAlloc)
-	gauges["RandomValue"] = float64(rand.Intn(1024) + 1)
+func compress(b []byte) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	gz := gzip.NewWriter(buf)
 
-	return gauges
+	_, err := gz.Write(b)
+	if err != nil {
+		return nil, err
+	}
+	if err := gz.Close(); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }

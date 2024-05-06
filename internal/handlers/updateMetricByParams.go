@@ -11,8 +11,7 @@ import (
 )
 
 func (h *Handlers) UpdateMetricByParams(w http.ResponseWriter, r *http.Request) {
-	r.Method = http.MethodPost
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
 	metricsService := service.NewMetricsService(h.Storage)
 
@@ -24,14 +23,14 @@ func (h *Handlers) UpdateMetricByParams(w http.ResponseWriter, r *http.Request) 
 		MType: t,
 	}
 
-	if metrics.MType == gauge {
+	if metrics.MType == models.Gauge {
 		convertedVal, err := strconv.ParseFloat(strings.TrimSpace(mv), 64)
 		if err != nil {
 			http.Error(w, "unsupported gauge value", http.StatusBadRequest)
 			return
 		}
 		metrics.Value = &convertedVal
-	} else if metrics.MType == counter {
+	} else if metrics.MType == models.Counter {
 		convertedVal, err := strconv.ParseInt(strings.TrimSpace(mv), 10, 64)
 		if err != nil {
 			http.Error(w, "unsupported counter value", http.StatusBadRequest)

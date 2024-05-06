@@ -1,10 +1,7 @@
 package handlers
 
-import "github.com/dcwk/metrics/internal/storage"
-
-const (
-	gauge   = "gauge"
-	counter = "counter"
+import (
+	"github.com/dcwk/metrics/internal/storage"
 )
 
 type Handlers struct {

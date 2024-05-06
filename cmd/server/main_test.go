@@ -168,14 +168,14 @@ func TestGetMetricsByParams(t *testing.T) {
 		a += v
 		path = "/update/counter/testSetGet" + id + "/" + strconv.Itoa(v)
 		resp, err := client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			Post(ts.URL + path)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode())
 
 		path = "/value/counter/testSetGet" + id
 		resp, err = client.R().
-			SetHeader("Content-Type", "text/html").
+			SetHeader("Content-Type", "application/json").
 			Get(ts.URL + path)
 
 		require.NoError(t, err)

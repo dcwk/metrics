@@ -3,15 +3,20 @@ package storage
 import (
 	"errors"
 	"sync"
+
+	"github.com/dcwk/metrics/internal/models"
+	"github.com/mailru/easyjson"
 )
 
 type DataKeeper interface {
-	AddGauge(name string, value *float64) error
-	GetGauge(name string) (float64, error)
+	AddGauge(name string, value float64) error
+	GetGauge(name string, allowZeroVal bool) (float64, error)
 	GetAllGauges() map[string]float64
-	AddCounter(name string, value *int64) error
-	GetCounter(name string) (int64, error)
+	AddCounter(name string, value int64) error
+	GetCounter(name string, allowZeroVal bool) (int64, error)
 	GetAllCounters() map[string]int64
+	GetJSONMetrics() (string, error)
+	SaveMetricsList(metricsList *models.MetricsList)
 }
 
 type Gauge struct {
@@ -36,24 +41,29 @@ func NewStorage() *MemStorage {
 	}
 }
 
-func (ms *MemStorage) AddGauge(name string, value *float64) error {
+func (ms *MemStorage) AddGauge(name string, value float64) error {
 	ms.gaugeMx.Lock()
 	defer ms.gaugeMx.Unlock()
 
-	ms.gauge[name] = *value
+	ms.gauge[name] = value
 
 	return nil
 }
 
-func (ms *MemStorage) GetGauge(name string) (float64, error) {
+func (ms *MemStorage) GetGauge(name string, allowZeroVal bool) (float64, error) {
 	ms.gaugeMx.RLock()
 	defer ms.gaugeMx.RUnlock()
 
-	if ms.gauge[name] == 0 {
+	if ms.gauge[name] == 0 && !allowZeroVal {
 		return 0, errors.New("gauge not found")
 	}
 
-	return ms.gauge[name], nil
+	val, ok := ms.gauge[name]
+	if !ok {
+		return 0, errors.New("failed to get metric")
+	}
+
+	return val, nil
 }
 
 func (ms *MemStorage) GetAllGauges() map[string]float64 {
@@ -63,24 +73,29 @@ func (ms *MemStorage) GetAllGauges() map[string]float64 {
 	return ms.gauge
 }
 
-func (ms *MemStorage) AddCounter(name string, value *int64) error {
+func (ms *MemStorage) AddCounter(name string, value int64) error {
 	ms.counterMx.Lock()
 	defer ms.counterMx.Unlock()
 
-	ms.counter[name] += *value
+	ms.counter[name] += value
 
 	return nil
 }
 
-func (ms *MemStorage) GetCounter(name string) (int64, error) {
+func (ms *MemStorage) GetCounter(name string, allowZeroVal bool) (int64, error) {
 	ms.counterMx.RLock()
 	defer ms.counterMx.RUnlock()
 
-	if ms.counter[name] == 0 {
+	if ms.counter[name] == 0 && !allowZeroVal {
 		return 0, errors.New("counter not found")
 	}
 
-	return ms.counter[name], nil
+	val, ok := ms.counter[name]
+	if !ok {
+		return 0, errors.New("failed to get metric")
+	}
+
+	return val, nil
 }
 
 func (ms *MemStorage) GetAllCounters() map[string]int64 {
@@ -88,4 +103,44 @@ func (ms *MemStorage) GetAllCounters() map[string]int64 {
 	defer ms.counterMx.RUnlock()
 
 	return ms.counter
+}
+
+func (ms *MemStorage) GetJSONMetrics() (string, error) {
+	metricsList := models.MetricsList{}
+	for k, v := range ms.gauge {
+		metric := models.Metrics{
+			ID:    k,
+			MType: models.Gauge,
+			Value: &v,
+		}
+		metricsList.List = append(metricsList.List, metric)
+	}
+
+	for k, v := range ms.counter {
+		metric := models.Metrics{
+			ID:    k,
+			MType: models.Counter,
+			Delta: &v,
+		}
+		metricsList.List = append(metricsList.List, metric)
+	}
+
+	metricsListJSON, err := easyjson.Marshal(&metricsList)
+	if err != nil {
+		return "", err
+	}
+
+	return string(metricsListJSON), nil
+}
+
+func (ms *MemStorage) SaveMetricsList(metricsList *models.MetricsList) {
+	for _, v := range metricsList.List {
+		if v.MType == models.Gauge {
+			_ = ms.AddGauge(v.ID, *v.Value)
+		}
+
+		if v.MType == models.Counter {
+			_ = ms.AddCounter(v.ID, *v.Delta)
+		}
+	}
 }
