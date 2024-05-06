@@ -1,27 +1,60 @@
 package handlers
 
 import (
-	"bytes"
 	"fmt"
-	"net/http"
+	"math/rand"
 	"runtime"
+
+	"github.com/dcwk/metrics/internal/models"
+	"github.com/go-resty/resty/v2"
+	"github.com/mailru/easyjson"
 )
 
-func (h *Handlers) SendMetrics(addr string) error {
+func (h *Handlers) SendMetrics(addr string, pollCount int64) error {
 	for k, v := range getGauges() {
-		r := bytes.NewReader([]byte(""))
-		resp, err := http.Post(
-			fmt.Sprintf("http://%s/update/gauge/%s/%f", addr, k, v),
-			"Content-Type: text/plain",
-			r,
-		)
+		metric := models.Metrics{
+			ID:    k,
+			MType: gauge,
+			Value: &v,
+		}
+		json, err := easyjson.Marshal(&metric)
 		if err != nil {
 			return err
 		}
 
-		if err := resp.Body.Close(); err != nil {
+		//logger.Log.Info(string(json))
+
+		if err := send(string(json), addr); err != nil {
 			return err
 		}
+	}
+
+	metric := models.Metrics{
+		ID:    "PollCount",
+		MType: counter,
+		Delta: &pollCount,
+	}
+
+	json, err := easyjson.Marshal(&metric)
+	if err != nil {
+		return err
+	}
+
+	if err := send(string(json), addr); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func send(metricsJSON string, addr string) error {
+	client := resty.New()
+	_, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(metricsJSON).
+		Post(fmt.Sprintf("http://%s/update/", addr))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -31,8 +64,8 @@ func getGauges() map[string]float64 {
 	gauges := map[string]float64{}
 	ms := runtime.MemStats{}
 	runtime.ReadMemStats(&ms)
-
 	gauges["Alloc"] = float64(ms.Alloc)
+	gauges["GCCPUFraction"] = float64(ms.GCCPUFraction)
 	gauges["BuckHashSys"] = float64(ms.BuckHashSys)
 	gauges["Frees"] = float64(ms.Frees)
 	gauges["GCSys"] = float64(ms.GCSys)
@@ -58,6 +91,7 @@ func getGauges() map[string]float64 {
 	gauges["StackSys"] = float64(ms.StackSys)
 	gauges["Sys"] = float64(ms.Sys)
 	gauges["TotalAlloc"] = float64(ms.TotalAlloc)
+	gauges["RandomValue"] = float64(rand.Intn(1024) + 1)
 
 	return gauges
 }
