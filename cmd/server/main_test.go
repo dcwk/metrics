@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/server"
@@ -23,8 +24,8 @@ func TestUpdateMetricsByParams(t *testing.T) {
 	if err := logger.Initialize("info"); err != nil {
 		panic(err)
 	}
-
-	ts := httptest.NewServer(server.Router(s))
+	conf := &config.ServerConf{}
+	ts := httptest.NewServer(server.Router(s, conf))
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -119,8 +120,9 @@ func TestUpdateMetricsByJson(t *testing.T) {
 	if err := logger.Initialize("info"); err != nil {
 		panic(err)
 	}
+	conf := &config.ServerConf{}
 
-	ts := httptest.NewServer(server.Router(s))
+	ts := httptest.NewServer(server.Router(s, conf))
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -157,8 +159,9 @@ func TestUpdateMetricsByJson(t *testing.T) {
 
 func TestGetMetricsByParams(t *testing.T) {
 	s := storage.NewStorage()
+	conf := &config.ServerConf{}
 
-	ts := httptest.NewServer(server.Router(s))
+	ts := httptest.NewServer(server.Router(s, conf))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
@@ -188,8 +191,9 @@ func TestGetMetricsByParams(t *testing.T) {
 
 func TestGetCounterMetricsByJson(t *testing.T) {
 	s := storage.NewStorage()
+	conf := &config.ServerConf{}
 
-	ts := httptest.NewServer(server.Router(s))
+	ts := httptest.NewServer(server.Router(s, conf))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
@@ -245,8 +249,9 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 
 func TestGetGaugeMetricsByJson(t *testing.T) {
 	s := storage.NewStorage()
+	conf := &config.ServerConf{}
 
-	ts := httptest.NewServer(server.Router(s))
+	ts := httptest.NewServer(server.Router(s, conf))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
