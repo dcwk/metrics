@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -24,12 +23,8 @@ func TestUpdateMetricsByParams(t *testing.T) {
 	if err := logger.Initialize("info"); err != nil {
 		panic(err)
 	}
-	db, err := sql.Open("pgx", "")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	ts := httptest.NewServer(server.Router(s, db))
+
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -124,12 +119,8 @@ func TestUpdateMetricsByJson(t *testing.T) {
 	if err := logger.Initialize("info"); err != nil {
 		panic(err)
 	}
-	db, err := sql.Open("pgx", "")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	ts := httptest.NewServer(server.Router(s, db))
+
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 
 	var testTable = []struct {
@@ -166,12 +157,8 @@ func TestUpdateMetricsByJson(t *testing.T) {
 
 func TestGetMetricsByParams(t *testing.T) {
 	s := storage.NewStorage()
-	db, err := sql.Open("pgx", "")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	ts := httptest.NewServer(server.Router(s, db))
+
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
@@ -201,12 +188,8 @@ func TestGetMetricsByParams(t *testing.T) {
 
 func TestGetCounterMetricsByJson(t *testing.T) {
 	s := storage.NewStorage()
-	db, err := sql.Open("pgx", "")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	ts := httptest.NewServer(server.Router(s, db))
+
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))
@@ -262,12 +245,8 @@ func TestGetCounterMetricsByJson(t *testing.T) {
 
 func TestGetGaugeMetricsByJson(t *testing.T) {
 	s := storage.NewStorage()
-	db, err := sql.Open("pgx", "")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	ts := httptest.NewServer(server.Router(s, db))
+
+	ts := httptest.NewServer(server.Router(s))
 	defer ts.Close()
 	path := ""
 	id := strconv.Itoa(rand.Intn(256))

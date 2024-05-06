@@ -23,27 +23,45 @@ func Run(conf *config.ServerConf) {
 	if err := logger.Initialize(conf.LogLevel); err != nil {
 		panic(err)
 	}
-	stor := storage.NewStorage()
-	if conf.Restore {
-		restore(stor, conf)
+	var memStorage *storage.MemStorage
+	var dbStorage *storage.DatabaseStorage
+
+	if conf.DatabaseDSN == "" {
+		memStorage = storage.NewStorage()
+	} else {
+		db, err := sql.Open("pgx", conf.DatabaseDSN)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		dbStorage, err = storage.NewDBStorage(db)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	db, err := sql.Open("pgx", conf.DatabaseDSN)
-	if err != nil {
-		panic(err)
+	if conf.Restore && memStorage != nil {
+		restore(memStorage, conf)
 	}
-	defer db.Close()
 
-	go flush(stor, conf)
+	if memStorage != nil {
+		go flush(memStorage, conf)
+	}
 
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
-	if err := http.ListenAndServe(conf.ServerAddr, Router(stor, db)); err != nil {
-		panic(err)
+	if memStorage != nil {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(memStorage)); err != nil {
+			panic(err)
+		}
+	} else {
+		if err := http.ListenAndServe(conf.ServerAddr, Router(dbStorage)); err != nil {
+			panic(err)
+		}
 	}
-
 }
 
-func Router(storage storage.DataKeeper, db *sql.DB) chi.Router {
+func Router(storage storage.DataKeeper) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
@@ -51,7 +69,6 @@ func Router(storage storage.DataKeeper, db *sql.DB) chi.Router {
 
 	h := handlers.Handlers{
 		Storage: storage,
-		DB:      db,
 	}
 
 	r.Get("/", h.GetAllMetrics)
@@ -64,7 +81,7 @@ func Router(storage storage.DataKeeper, db *sql.DB) chi.Router {
 	return r
 }
 
-func restore(storage storage.DataKeeper, conf *config.ServerConf) {
+func restore(storage storage.MemoryKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
 	}
@@ -87,7 +104,7 @@ func restore(storage storage.DataKeeper, conf *config.ServerConf) {
 	storage.SaveMetricsList(&metricsList)
 }
 
-func flush(storage storage.DataKeeper, conf *config.ServerConf) {
+func flush(storage storage.MemoryKeeper, conf *config.ServerConf) {
 	if conf.FileStoragePath == "" {
 		return
 	}
