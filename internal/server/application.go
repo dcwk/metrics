@@ -29,11 +29,28 @@ func Run(conf *config.ServerConf) {
 	if conf.DatabaseDSN == "" {
 		memStorage = storage.NewStorage()
 	} else {
+		//sleepDuration := 1
+		var err error
 		db, err := sql.Open("pgx", conf.DatabaseDSN)
 		if err != nil {
 			panic(err)
 		}
 		defer db.Close()
+
+		//for i := 0; i < 3; i++ {
+		//	err = db.Ping()
+		//	if err != nil {
+		//		logger.Log.Info(fmt.Sprintf("Can't connect to database sleep %v", sleepDuration))
+		//		time.Sleep(time.Duration(sleepDuration) * time.Second)
+		//		sleepDuration += 2
+		//		continue
+		//	}
+		//
+		//	break
+		//}
+		//if err != nil {
+		//	panic(err)
+		//}
 
 		dbStorage, err = storage.NewDBStorage(db)
 		if err != nil {

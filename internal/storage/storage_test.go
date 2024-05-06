@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"testing"
 
 	"github.com/dcwk/metrics/internal/models"
@@ -145,5 +146,35 @@ func TestCanSaveMetricsList(t *testing.T) {
 
 		metricsList, _ := storage.GetJSONMetrics()
 		assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64},{"id":"test","type":"counter","delta":10}]}`)
+	})
+}
+
+func TestCanAddMetricsBatchMode(t *testing.T) {
+	t.Run("test can add metrics at batch mode", func(t *testing.T) {
+
+		storage := NewStorage()
+		value := float64(10.64)
+		delta := int64(10)
+		gauge := models.Metrics{ID: "test", MType: models.Gauge, Value: &value}
+		counter := models.Metrics{ID: "test", MType: models.Counter, Delta: &delta}
+		list := models.MetricsList{
+			List: []models.Metrics{gauge, counter},
+		}
+
+		err := storage.AddMetricsAtBatchMode(&list)
+		assert.NoError(t, err)
+
+		metricsList, _ := storage.GetJSONMetrics()
+		assert.Equal(t, metricsList, `{"list":[{"id":"test","type":"gauge","value":10.64},{"id":"test","type":"counter","delta":10}]}`)
+	})
+}
+
+func TestCanPing(t *testing.T) {
+	t.Run("test can run ping", func(t *testing.T) {
+		storage := NewStorage()
+		ctx := context.Background()
+		err := storage.Ping(ctx)
+
+		assert.NoError(t, err)
 	})
 }
