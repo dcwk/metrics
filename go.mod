@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/caarlos0/env v3.5.0+incompatible
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.0.14
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/mailru/easyjson v0.7.7
