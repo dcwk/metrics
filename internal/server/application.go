@@ -20,6 +20,7 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
+	"github.com/dcwk/metrics/internal/utils"
 )
 
 func Run(conf *config.ServerConf) {
@@ -85,9 +86,8 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
-	//r.Use(utils.GzipMiddleware)
-	//r.Use(utils.SignMiddleware(conf.HashKey))
-	r.Mount("/debug", middleware.Profiler())
+	r.Use(utils.GzipMiddleware)
+	r.Mount("/debug", Profiler())
 
 	h := handlers.Handlers{
 		Storage: storage,
@@ -156,7 +156,10 @@ func flush(storage storage.MemoryKeeper, conf *config.ServerConf) {
 
 func Profiler() http.Handler {
 	r := chi.NewRouter()
+
 	r.Use(middleware.NoCache)
+	r.Use(utils.GzipMiddleware)
+	//r.Use(utils.SignMiddleware(conf.HashKey))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, r.RequestURI+"/pprof/", http.StatusMovedPermanently)
