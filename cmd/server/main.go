@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	_ "net/http/pprof"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/server"
