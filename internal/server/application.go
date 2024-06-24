@@ -3,20 +3,23 @@ package server
 import (
 	"bufio"
 	"database/sql"
+	"expvar"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/mailru/easyjson"
+	"go.uber.org/zap"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
-	"github.com/dcwk/metrics/internal/utils"
-	"github.com/go-chi/chi/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/mailru/easyjson"
-	"go.uber.org/zap"
 )
 
 func Run(conf *config.ServerConf) {
@@ -82,8 +85,9 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
-	r.Use(utils.GzipMiddleware)
-	r.Use(utils.SignMiddleware(conf.HashKey))
+	//r.Use(utils.GzipMiddleware)
+	//r.Use(utils.SignMiddleware(conf.HashKey))
+	r.Mount("/debug", middleware.Profiler())
 
 	h := handlers.Handlers{
 		Storage: storage,
@@ -148,4 +152,32 @@ func flush(storage storage.MemoryKeeper, conf *config.ServerConf) {
 
 		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
+}
+
+func Profiler() http.Handler {
+	r := chi.NewRouter()
+	r.Use(middleware.NoCache)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, r.RequestURI+"/pprof/", http.StatusMovedPermanently)
+	})
+	r.HandleFunc("/pprof", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, r.RequestURI+"/", http.StatusMovedPermanently)
+	})
+
+	r.HandleFunc("/pprof/*", pprof.Index)
+	r.HandleFunc("/pprof/cmdline", pprof.Cmdline)
+	r.HandleFunc("/pprof/profile", pprof.Profile)
+	r.HandleFunc("/pprof/symbol", pprof.Symbol)
+	r.HandleFunc("/pprof/trace", pprof.Trace)
+	r.Handle("/vars", expvar.Handler())
+
+	r.Handle("/pprof/goroutine", pprof.Handler("goroutine"))
+	r.Handle("/pprof/threadcreate", pprof.Handler("threadcreate"))
+	r.Handle("/pprof/mutex", pprof.Handler("mutex"))
+	r.Handle("/pprof/heap", pprof.Handler("heap"))
+	r.Handle("/pprof/block", pprof.Handler("block"))
+	r.Handle("/pprof/allocs", pprof.Handler("allocs"))
+
+	return r
 }
