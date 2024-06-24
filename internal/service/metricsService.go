@@ -1,3 +1,4 @@
+// Пакет service содержит сервисы для упрощения работы с логикой приложения
 package service
 
 import (
@@ -17,6 +18,7 @@ func NewMetricsService(storage storage.DataKeeper) *MetricsService {
 	}
 }
 
+// UpdateMetrics - обновляет метрики в выбранном хранилище
 func (ms *MetricsService) UpdateMetrics(metrics *models.Metrics) error {
 	switch metrics.MType {
 	default:
@@ -34,6 +36,7 @@ func (ms *MetricsService) UpdateMetrics(metrics *models.Metrics) error {
 	return nil
 }
 
+// GetMetrics - загружает метрики из выбранного хранилища
 func (ms *MetricsService) GetMetrics(metrics *models.Metrics) (*models.Metrics, error) {
 	switch metrics.MType {
 	default:

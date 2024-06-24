@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-chi/chi/v5"
+
+	"github.com/dcwk/metrics/internal/models"
 )
 
+// GetMetricByParams - получение списка метрик с фильтром в query string
 func (h *Handlers) GetMetricByParams(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
