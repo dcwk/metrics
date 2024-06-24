@@ -3,9 +3,7 @@ package server
 import (
 	"bufio"
 	"database/sql"
-	"expvar"
 	"net/http"
-	"net/http/pprof"
 	"os"
 	"time"
 
@@ -86,20 +84,26 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
-	r.Use(utils.GzipMiddleware)
-	r.Mount("/debug", Profiler())
+	if conf.IsActivePprof {
+		r.Mount("/debug", middleware.Profiler())
+	}
 
 	h := handlers.Handlers{
 		Storage: storage,
 	}
 
-	r.Get("/", h.GetAllMetrics)
-	r.Get("/ping", h.Ping)
-	r.Get("/value/{type}/{name}", h.GetMetricByParams)
-	r.Post("/value/", h.GetMetricByJSON)
-	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-	r.Post("/update/", h.UpdateMetricByJSON)
-	r.Post("/updates/", h.UpdateBatchMetricByJSON)
+	r.Route("/", func(r chi.Router) {
+		r.Use(utils.GzipMiddleware)
+		r.Use(utils.SignMiddleware(conf.HashKey))
+
+		r.Get("/", h.GetAllMetrics)
+		r.Get("/ping", h.Ping)
+		r.Get("/value/{type}/{name}", h.GetMetricByParams)
+		r.Post("/value/", h.GetMetricByJSON)
+		r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.Post("/update/", h.UpdateMetricByJSON)
+		r.Post("/updates/", h.UpdateBatchMetricByJSON)
+	})
 
 	return r
 }
@@ -152,35 +156,4 @@ func flush(storage storage.MemoryKeeper, conf *config.ServerConf) {
 
 		time.Sleep(time.Duration(conf.StoreInterval) * time.Second)
 	}
-}
-
-func Profiler() http.Handler {
-	r := chi.NewRouter()
-
-	r.Use(middleware.NoCache)
-	r.Use(utils.GzipMiddleware)
-	//r.Use(utils.SignMiddleware(conf.HashKey))
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, r.RequestURI+"/pprof/", http.StatusMovedPermanently)
-	})
-	r.HandleFunc("/pprof", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, r.RequestURI+"/", http.StatusMovedPermanently)
-	})
-
-	r.HandleFunc("/pprof/*", pprof.Index)
-	r.HandleFunc("/pprof/cmdline", pprof.Cmdline)
-	r.HandleFunc("/pprof/profile", pprof.Profile)
-	r.HandleFunc("/pprof/symbol", pprof.Symbol)
-	r.HandleFunc("/pprof/trace", pprof.Trace)
-	r.Handle("/vars", expvar.Handler())
-
-	r.Handle("/pprof/goroutine", pprof.Handler("goroutine"))
-	r.Handle("/pprof/threadcreate", pprof.Handler("threadcreate"))
-	r.Handle("/pprof/mutex", pprof.Handler("mutex"))
-	r.Handle("/pprof/heap", pprof.Handler("heap"))
-	r.Handle("/pprof/block", pprof.Handler("block"))
-	r.Handle("/pprof/allocs", pprof.Handler("allocs"))
-
-	return r
 }
