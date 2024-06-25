@@ -1,3 +1,4 @@
+// Основные use case сервиса сбора метрик
 package handlers
 
 import (

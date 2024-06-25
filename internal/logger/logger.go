@@ -1,3 +1,4 @@
+// Пакет logger добавляет работу с логгированием
 package logger
 
 import (
@@ -47,6 +48,7 @@ func Initialize(level string) error {
 	return nil
 }
 
+// RequestLogger - middleware для логгирования данных запроса
 func RequestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		responseData := &responseData{}

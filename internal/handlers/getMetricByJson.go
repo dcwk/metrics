@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/mailru/easyjson"
+
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
-	"github.com/mailru/easyjson"
 )
 
+// GetMetricByJSON - получение конкретных метрик с фильтром в формате JSON
 func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Content-Encoding", "gzip")

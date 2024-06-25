@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/mailru/easyjson"
+
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/service"
-	"github.com/mailru/easyjson"
 )
 
+// UpdateMetricByJSON - обновляет одну метрику переданную в body в формате JSON
 func (h *Handlers) UpdateMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Content-Encoding", "gzip")

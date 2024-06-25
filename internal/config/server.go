@@ -1,3 +1,4 @@
+// Содержит переменные окружение и флаги для описания конфигурации сервера сбора метрик.
 package config
 
 import (
@@ -14,6 +15,7 @@ type ServerConf struct {
 	Restore         bool   `env:"RESTORE"`
 	DatabaseDSN     string `env:"DATABASE_DSN"`
 	HashKey         string `env:"KEY"`
+	IsActivePprof   bool   `env:"IS_ACTIVE_PPROF" envDefault:"false"`
 }
 
 func NewServerConf() (*ServerConf, error) {
@@ -26,6 +28,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.FileStoragePath, "f", "/tmp/metrics-db.json", "file storage path")
 	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
+	flag.BoolVar(&conf.IsActivePprof, "p", false, "enable pprof")
 	flag.Parse()
 
 	err := env.Parse(conf)

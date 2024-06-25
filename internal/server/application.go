@@ -7,16 +7,18 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/mailru/easyjson"
+	"go.uber.org/zap"
+
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/dcwk/metrics/internal/utils"
-	"github.com/go-chi/chi/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/mailru/easyjson"
-	"go.uber.org/zap"
 )
 
 func Run(conf *config.ServerConf) {
@@ -82,20 +84,26 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(logger.RequestLogger)
-	r.Use(utils.GzipMiddleware)
-	r.Use(utils.SignMiddleware(conf.HashKey))
+	if conf.IsActivePprof {
+		r.Mount("/debug", middleware.Profiler())
+	}
 
 	h := handlers.Handlers{
 		Storage: storage,
 	}
 
-	r.Get("/", h.GetAllMetrics)
-	r.Get("/ping", h.Ping)
-	r.Get("/value/{type}/{name}", h.GetMetricByParams)
-	r.Post("/value/", h.GetMetricByJSON)
-	r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-	r.Post("/update/", h.UpdateMetricByJSON)
-	r.Post("/updates/", h.UpdateBatchMetricByJSON)
+	r.Route("/", func(r chi.Router) {
+		r.Use(utils.GzipMiddleware)
+		r.Use(utils.SignMiddleware(conf.HashKey))
+
+		r.Get("/", h.GetAllMetrics)
+		r.Get("/ping", h.Ping)
+		r.Get("/value/{type}/{name}", h.GetMetricByParams)
+		r.Post("/value/", h.GetMetricByJSON)
+		r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.Post("/update/", h.UpdateMetricByJSON)
+		r.Post("/updates/", h.UpdateBatchMetricByJSON)
+	})
 
 	return r
 }
