@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// GetAllMetrics - получение всех сохраненных метрик
 func (h *Handlers) GetAllMetrics(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 

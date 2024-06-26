@@ -7,6 +7,7 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 )
 
+// Ping - проверяет коннект к бд
 func (h *Handlers) Ping(w http.ResponseWriter, r *http.Request) {
 	err := h.Storage.Ping(r.Context())
 	if err != nil {

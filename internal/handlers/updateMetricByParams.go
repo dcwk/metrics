@@ -5,11 +5,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/service"
-	"github.com/go-chi/chi/v5"
 )
 
+// UpdateMetricByParams - обновляет метрику переданную в query string
 func (h *Handlers) UpdateMetricByParams(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
