@@ -23,12 +23,6 @@ func (h *Handlers) GetMetricByJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metricsJSON, err := easyjson.Marshal(metrics)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	logger.Log.Info(string(metricsJSON))
-
 	switch metrics.MType {
 	default:
 		return
