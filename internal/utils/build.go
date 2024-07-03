@@ -3,9 +3,9 @@ package utils
 import "fmt"
 
 func BuildInfo(buildVersion string, buildDate string, buildCommit string) {
-	fmt.Println(fmt.Sprintf("Build version: %s", strValOrDefault(buildVersion, "N/A")))
-	fmt.Println(fmt.Sprintf("Build date: %s", strValOrDefault(buildDate, "N/A")))
-	fmt.Println(fmt.Sprintf("Build commit: %s", strValOrDefault(buildCommit, "N/A")))
+	fmt.Printf("Build version: %s\n", strValOrDefault(buildVersion, "N/A"))
+	fmt.Printf("Build date: %s\n", strValOrDefault(buildDate, "N/A"))
+	fmt.Printf("Build commit: %s\n", strValOrDefault(buildCommit, "N/A"))
 }
 
 func strValOrDefault(val string, defaultVal string) string {
