@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -39,20 +38,4 @@ func main() {
 
 		return
 	}
-}
-
-func buildInfo() {
-	if buildVersion == "" {
-		buildVersion = "N/A"
-	}
-	if buildDate == "" {
-		buildDate = "N/A"
-	}
-	if buildCommit == "" {
-		buildCommit = "N/A"
-	}
-
-	fmt.Println(fmt.Sprintf("Build version: %s", buildVersion))
-	fmt.Println(fmt.Sprintf("Build date: %s", buildDate))
-	fmt.Println(fmt.Sprintf("Build commit: %s", buildCommit))
 }
