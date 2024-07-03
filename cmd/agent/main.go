@@ -10,6 +10,7 @@ import (
 
 	"github.com/dcwk/metrics/internal/client"
 	"github.com/dcwk/metrics/internal/config"
+	"github.com/dcwk/metrics/internal/utils"
 )
 
 var buildVersion string
@@ -21,7 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	buildInfo()
+
+	utils.BuildInfo(buildVersion, buildDate, buildCommit)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {

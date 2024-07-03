@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	_ "net/http/pprof"
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/server"
+	"github.com/dcwk/metrics/internal/utils"
 )
 
 var buildVersion string
@@ -19,22 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	buildInfo()
+	utils.BuildInfo(buildVersion, buildDate, buildCommit)
 	server.Run(conf)
-}
-
-func buildInfo() {
-	if buildVersion == "" {
-		buildVersion = "N/A"
-	}
-	if buildDate == "" {
-		buildDate = "N/A"
-	}
-	if buildCommit == "" {
-		buildCommit = "N/A"
-	}
-
-	fmt.Println(fmt.Sprintf("Build version: %s", buildVersion))
-	fmt.Println(fmt.Sprintf("Build date: %s", buildDate))
-	fmt.Println(fmt.Sprintf("Build commit: %s", buildCommit))
 }
