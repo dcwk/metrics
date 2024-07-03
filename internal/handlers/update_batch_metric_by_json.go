@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/mailru/easyjson"
+
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
-	"github.com/mailru/easyjson"
 )
 
+// UpdateBatchMetricByJSON - обновляет все метрики переданные в body в формате JSON
 func (h *Handlers) UpdateBatchMetricByJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Content-Encoding", "gzip")
