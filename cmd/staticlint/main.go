@@ -2,9 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"os"
 	"path/filepath"
 
@@ -14,6 +11,8 @@ import (
 	"golang.org/x/tools/go/analysis/passes/shadow"
 	"golang.org/x/tools/go/analysis/passes/structtag"
 	"honnef.co/go/tools/staticcheck"
+
+	"github.com/dcwk/metrics/internal/utils/exitcheckanalyzer"
 )
 
 // Config — имя файла конфигурации.
@@ -41,6 +40,7 @@ func main() {
 		printf.Analyzer,
 		shadow.Analyzer,
 		structtag.Analyzer,
+		exitcheckanalyzer.ExitCheck,
 	}
 	checks := make(map[string]bool)
 	for _, v := range cfg.Staticcheck {
@@ -55,42 +55,4 @@ func main() {
 	multichecker.Main(
 		mychecks...,
 	)
-}
-
-func osExitLint() bool {
-	src := `package main
-import "fmt"
-
-func calc(a int) {
-   b := (a+8)*2
-   return b
-}
-
-func main() {
-    fmt.Println(calc(3), calc(5))
-    fmt.Println("Hello, world!")
-	os.Exit(0)
-}`
-
-	// дерево разбора AST ассоциируется с набором исходных файлов FileSet
-	fset := token.NewFileSet()
-	// парсер может работать с файлом
-	// или исходным кодом, переданным в виде строки
-	f, err := parser.ParseFile(fset, "", src, 0)
-	if err != nil {
-		panic(err)
-	}
-
-	ast.Inspect(f, func(n ast.Node) bool {
-		// проверяем, какой конкретный тип лежит в узле
-		switch x := n.(type) {
-		case *ast.Ident:
-			if x.Name == "osExit" {
-				return true
-			}
-		}
-		return false
-	})
-
-	return false
 }
