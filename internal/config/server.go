@@ -16,6 +16,7 @@ type ServerConf struct {
 	DatabaseDSN     string `env:"DATABASE_DSN"`
 	HashKey         string `env:"KEY"`
 	IsActivePprof   bool   `env:"IS_ACTIVE_PPROF" envDefault:"false"`
+	CryptoKey       string `env:"CRYPTO_KEY"`
 }
 
 func NewServerConf() (*ServerConf, error) {
@@ -29,6 +30,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
 	flag.BoolVar(&conf.IsActivePprof, "p", false, "enable pprof")
+	flag.StringVar(&conf.CryptoKey, "crypto-key", "", "path to private key")
 	flag.Parse()
 
 	err := env.Parse(conf)
