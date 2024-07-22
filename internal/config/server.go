@@ -30,7 +30,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.BoolVar(&conf.Restore, "r", true, "load exist data at server start")
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
 	flag.BoolVar(&conf.IsActivePprof, "p", false, "enable pprof")
-	flag.StringVar(&conf.CryptoKey, "crypto-key", "", "path to private key")
+	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/metrics/cmd/key_generator/private.pem", "path to private key")
 	flag.Parse()
 
 	err := env.Parse(conf)

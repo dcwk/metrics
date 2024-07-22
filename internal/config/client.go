@@ -24,7 +24,7 @@ func NewClientConf() (*ClientConf, error) {
 	flag.Int64Var(&conf.PollInterval, "p", 2, "metrics reading frequency")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key")
-	flag.StringVar(&conf.CryptoKey, "crypto-key", "", "path to public key")
+	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/metrics/cmd/key_generator/public.pem", "path to public key")
 	flag.Parse()
 
 	err := env.Parse(conf)
