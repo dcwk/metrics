@@ -14,6 +14,7 @@ import (
 
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
+	"github.com/dcwk/metrics/internal/utils"
 )
 
 func SendMetrics(metrics map[string]float64, addr string, hashKey string, cryptoKey string, pollCount *int64) error {
@@ -66,7 +67,7 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 		return err
 	}
 
-	body, err = encrypt(body, cryptoKey)
+	body, err = utils.Encrypt(body, cryptoKey)
 	if err != nil {
 		return err
 	}
