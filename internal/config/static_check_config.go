@@ -16,7 +16,7 @@ type ConfigData struct {
 }
 
 func config() {
-	data, err := os.ReadFile(filepath.Join(filepath.Dir(appfile), Config))
+	data, err := os.ReadFile(filepath.Join(filepath.Dir("./"), Config))
 	if err != nil {
 		log.Fatal(err)
 	}

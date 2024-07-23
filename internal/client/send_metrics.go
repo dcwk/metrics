@@ -4,10 +4,15 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/hmac"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/hex"
+	"encoding/pem"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
@@ -66,6 +71,11 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 		return err
 	}
 
+	body, err = encrypt(body, cryptoKey)
+	if err != nil {
+		return err
+	}
+
 	client := resty.New()
 	_, err = client.R().
 		SetHeaders(map[string]string{
@@ -82,6 +92,26 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 	}
 
 	return nil
+}
+
+func encrypt(b []byte, cryptoKeyPath string) ([]byte, error) {
+	publicKeyPEM, err := os.ReadFile(cryptoKeyPath)
+	if err != nil {
+		panic(err)
+	}
+
+	publicKeyBlock, _ := pem.Decode(publicKeyPEM)
+	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
+	if err != nil {
+		panic(err)
+	}
+
+	cipherText, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey.(*rsa.PublicKey), b)
+	if err != nil {
+		return nil, err
+	}
+
+	return cipherText, nil
 }
 
 func compress(b []byte) ([]byte, error) {
