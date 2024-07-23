@@ -100,8 +100,8 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 		r.Get("/ping", h.Ping)
 		r.Get("/value/{type}/{name}", h.GetMetricByParams)
 		r.Post("/value/", h.GetMetricByJSON)
-		r.Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-		r.Post("/update/", h.UpdateMetricByJSON)
+		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).Post("/update/", h.UpdateMetricByJSON)
 		r.Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 

@@ -15,6 +15,14 @@ func TestEncode(t *testing.T) {
 			Data:     "test",
 			Expected: "test",
 		},
+		{
+			Data:     "",
+			Expected: "",
+		},
+		{
+			Data:     "123123890###ololo",
+			Expected: "123123890###ololo",
+		},
 	}
 
 	for _, test := range tests {
