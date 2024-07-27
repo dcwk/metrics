@@ -2,9 +2,13 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -27,6 +31,9 @@ func Run(conf *config.ServerConf) {
 	}
 	var memStorage *storage.MemStorage
 	var dbStorage *storage.DatabaseStorage
+	var server http.Server
+	var sigChan = make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	if conf.DatabaseDSN == "" {
 		memStorage = storage.NewStorage()
@@ -70,13 +77,32 @@ func Run(conf *config.ServerConf) {
 
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
 	if memStorage != nil {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(memStorage, conf)); err != nil {
-			panic(err)
+		server = http.Server{
+			Addr:    conf.ServerAddr,
+			Handler: Router(memStorage, conf),
 		}
 	} else {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(dbStorage, conf)); err != nil {
-			panic(err)
+		server = http.Server{
+			Addr:    conf.ServerAddr,
+			Handler: Router(dbStorage, conf),
 		}
+	}
+
+	go func() {
+		sig := <-sigChan
+		fmt.Printf("fired signal: %s\n", sig)
+		timeoutContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		err := server.Shutdown(timeoutContext)
+		if err != nil {
+			fmt.Printf("Error shutting down server: %v\n", err)
+		}
+	}()
+
+	err := server.ListenAndServe()
+	if err != nil {
+		logger.Log.Fatal("HTTP server ListenAndServe: %v", zap.Error(err))
 	}
 }
 
