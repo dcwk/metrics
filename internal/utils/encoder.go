@@ -31,13 +31,13 @@ func Encrypt(b []byte, publicKeyPath string) ([]byte, error) {
 func Decrypt(b []byte, privateKeyPath string) ([]byte, error) {
 	privateKeyPEM, err := os.ReadFile(privateKeyPath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	privateKeyBlock, _ := pem.Decode(privateKeyPEM)
 	privateKey, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	decodedText, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, b[:])

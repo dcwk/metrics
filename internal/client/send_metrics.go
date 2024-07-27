@@ -62,16 +62,14 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 		sign = h.Sum(metricsJSON)
 	}
 
-	body, err := utils.Encrypt(metricsJSON, cryptoKey)
-	if err != nil {
-		logger.Log.Fatal(fmt.Sprintf("Failed to encrypt metrics: %s", err))
-	}
-
-	body, err = compress(body)
+	body, err := compress(metricsJSON)
 	if err != nil {
 		logger.Log.Fatal(fmt.Sprintf("Failed to compress metrics: %s", err))
 	}
-
+	body, err = utils.Encrypt(body, cryptoKey)
+	if err != nil {
+		logger.Log.Fatal(fmt.Sprintf("Failed to encrypt metrics: %s", err))
+	}
 	client := resty.New()
 	_, err = client.R().
 		SetHeaders(map[string]string{
