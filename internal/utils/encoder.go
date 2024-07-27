@@ -11,13 +11,13 @@ import (
 func Encrypt(b []byte, publicKeyPath string) ([]byte, error) {
 	publicKeyPEM, err := os.ReadFile(publicKeyPath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	publicKeyBlock, _ := pem.Decode(publicKeyPEM)
 	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	cipherText, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey.(*rsa.PublicKey), b)
