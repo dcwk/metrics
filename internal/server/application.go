@@ -121,17 +121,11 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", h.GetAllMetrics)
 		r.Get("/ping", h.Ping)
-		r.Get("/value/{type}/{name}", h.GetMetricByParams)
-		r.Post("/value/", h.GetMetricByJSON)
+		r.With(utils.GzipMiddleware).Get("/value/{type}/{name}", h.GetMetricByParams)
+		r.With(utils.GzipMiddleware).Post("/value/", h.GetMetricByJSON)
 
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
-			Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
-			Post("/update/", h.UpdateMetricByJSON)
+		r.With(utils.GzipMiddleware).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.With(utils.GzipMiddleware).Post("/update/", h.UpdateMetricByJSON)
 		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
 			With(utils.GzipMiddleware).
 			With(utils.SignMiddleware(conf.HashKey)).
