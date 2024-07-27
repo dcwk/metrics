@@ -21,7 +21,7 @@ type ClientConf struct {
 
 func NewClientConf() (*ClientConf, error) {
 	conf := &ClientConf{}
-	flag.StringVar(&conf.ConfigPath, "c", "internal/config/client_config.json", "path to json config file")
+	flag.StringVar(&conf.ConfigPath, "c", "../../internal/config/client_config.json", "path to json config file")
 	err := conf.loadConfigFile()
 	if err != nil {
 		return nil, err
