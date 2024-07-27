@@ -2,25 +2,33 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
+	"os"
 
 	"github.com/caarlos0/env"
 )
 
 type ServerConf struct {
-	ServerAddr      string `env:"ADDRESS"`
+	ServerAddr      string `env:"ADDRESS" json:"address"`
 	LogLevel        string `env:"LOG_LEVEL"`
-	StoreInterval   int64  `env:"STORE_INTERVAL"`
-	FileStoragePath string `env:"FILE_STORAGE_PATH"`
-	Restore         bool   `env:"RESTORE"`
-	DatabaseDSN     string `env:"DATABASE_DSN"`
+	StoreInterval   int64  `env:"STORE_INTERVAL" json:"store_interval"`
+	FileStoragePath string `env:"FILE_STORAGE_PATH" json:"store_file"`
+	Restore         bool   `env:"RESTORE" json:"restore"`
+	DatabaseDSN     string `env:"DATABASE_DSN" json:"database_dsn"`
 	HashKey         string `env:"KEY"`
 	IsActivePprof   bool   `env:"IS_ACTIVE_PPROF" envDefault:"false"`
-	CryptoKey       string `env:"CRYPTO_KEY"`
+	CryptoKey       string `env:"CRYPTO_KEY" json:"crypto_key"`
+	ConfigPath      string `env:"CONFIG"`
 }
 
 func NewServerConf() (*ServerConf, error) {
 	conf := &ServerConf{}
+	flag.StringVar(&conf.ConfigPath, "c", "internal/config/server_config.json", "Path to json config file")
+	err := conf.loadConfigFile()
+	if err != nil {
+		return nil, err
+	}
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "address and port to run server")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
@@ -33,10 +41,33 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/keys/private.pem", "path to private key")
 	flag.Parse()
 
-	err := env.Parse(conf)
+	err = env.Parse(conf)
 	if err != nil {
 		return nil, err
 	}
 
 	return conf, err
+}
+
+func (conf *ServerConf) loadConfigFile() error {
+	if conf.ConfigPath == "" {
+		return nil
+	}
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile(currentDir + string(os.PathSeparator) + conf.ConfigPath)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, conf)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
