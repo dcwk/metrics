@@ -2,22 +2,30 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
+	"os"
 
 	"github.com/caarlos0/env"
 )
 
 type ClientConf struct {
-	ServerAddr     string `env:"ADDRESS"`
-	ReportInterval int64  `env:"REPORT_INTERVAL"`
-	PollInterval   int64  `env:"POLL_INTERVAL"`
+	ServerAddr     string `env:"ADDRESS" json:"address"`
+	ReportInterval int64  `env:"REPORT_INTERVAL" json:"report_interval"`
+	PollInterval   int64  `env:"POLL_INTERVAL" json:"poll_interval"`
 	LogLevel       string `env:"LOG_LEVEL"`
 	HashKey        string `env:"KEY"`
-	CryptoKey      string `env:"CRYPTO_KEY"`
+	CryptoKey      string `env:"CRYPTO_KEY" json:"crypto_key"`
+	ConfigPath     string `env:"CONFIG_PATH"`
 }
 
 func NewClientConf() (*ClientConf, error) {
 	conf := &ClientConf{}
+	flag.StringVar(&conf.ConfigPath, "c", "internal/config/client_config.json", "path to json config file")
+	err := conf.loadConfigFile()
+	if err != nil {
+		return nil, err
+	}
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "metrics server address")
 	flag.Int64Var(&conf.ReportInterval, "r", 10, "sending frequency interval")
@@ -27,10 +35,33 @@ func NewClientConf() (*ClientConf, error) {
 	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/keys/public.pem", "path to public key")
 	flag.Parse()
 
-	err := env.Parse(conf)
+	err = env.Parse(conf)
 	if err != nil {
 		return nil, err
 	}
 
 	return conf, nil
+}
+
+func (conf *ClientConf) loadConfigFile() error {
+	if conf.ConfigPath == "" {
+		return nil
+	}
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile(currentDir + string(os.PathSeparator) + conf.ConfigPath)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, conf)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
