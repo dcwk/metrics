@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// Функция шифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
+// EncryptWithRSA шифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
 func EncryptWithRSA(b []byte, publicKeyPath string) ([]byte, error) {
 	publicKeyPEM, err := os.ReadFile(publicKeyPath)
 	if err != nil {
@@ -29,7 +29,7 @@ func EncryptWithRSA(b []byte, publicKeyPath string) ([]byte, error) {
 	return cipherText, nil
 }
 
-// Функция дешифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
+// DecryptWithRSA дешифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
 func DecryptWithRSA(b []byte, privateKeyPath string) ([]byte, error) {
 	privateKeyPEM, err := os.ReadFile(privateKeyPath)
 	if err != nil {

@@ -22,8 +22,9 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
-	"github.com/dcwk/metrics/internal/utils"
+	"github.com/dcwk/metrics/internal/utils/compress"
 	"github.com/dcwk/metrics/internal/utils/crypt"
+	"github.com/dcwk/metrics/internal/utils/sign"
 )
 
 func Run(conf *config.ServerConf) {
@@ -122,14 +123,14 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", h.GetAllMetrics)
 		r.Get("/ping", h.Ping)
-		r.With(utils.GzipMiddleware).Get("/value/{type}/{name}", h.GetMetricByParams)
-		r.With(utils.GzipMiddleware).Post("/value/", h.GetMetricByJSON)
+		r.With(compress.GzipMiddleware).Get("/value/{type}/{name}", h.GetMetricByParams)
+		r.With(compress.GzipMiddleware).Post("/value/", h.GetMetricByJSON)
 
-		r.With(utils.GzipMiddleware).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-		r.With(utils.GzipMiddleware).Post("/update/", h.UpdateMetricByJSON)
+		r.With(compress.GzipMiddleware).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.With(compress.GzipMiddleware).Post("/update/", h.UpdateMetricByJSON)
 		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
+			With(compress.GzipMiddleware).
+			With(sign.SignMiddleware(conf.HashKey)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 
