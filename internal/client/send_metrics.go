@@ -9,13 +9,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/dcwk/metrics/internal/logger"
-	"github.com/dcwk/metrics/internal/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
+
+	"github.com/dcwk/metrics/internal/logger"
+	"github.com/dcwk/metrics/internal/models"
+	"github.com/dcwk/metrics/internal/utils"
 )
 
-func SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCount *int64) error {
+func SendMetrics(metrics map[string]float64, addr string, hashKey string, cryptoKey string, pollCount *int64) error {
 	path := fmt.Sprintf("http://%s/update/", addr)
 
 	for k, v := range metrics {
@@ -30,7 +32,7 @@ func SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCo
 		}
 		log.Printf("reported metric JSON %s with value %f\n", k, v)
 
-		if err := send(json, path, hashKey); err != nil {
+		if err := send(json, path, hashKey, cryptoKey); err != nil {
 			return err
 		}
 	}
@@ -46,14 +48,14 @@ func SendMetrics(metrics map[string]float64, addr string, hashKey string, pollCo
 		return err
 	}
 
-	if err := send(json, path, hashKey); err != nil {
+	if err := send(json, path, hashKey, cryptoKey); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func send(metricsJSON []byte, path string, hashKey string) error {
+func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) error {
 	var sign []byte
 	if hashKey != "" {
 		h := hmac.New(sha256.New, []byte(hashKey))
@@ -62,9 +64,12 @@ func send(metricsJSON []byte, path string, hashKey string) error {
 
 	body, err := compress(metricsJSON)
 	if err != nil {
-		return err
+		logger.Log.Fatal(fmt.Sprintf("Failed to compress metrics: %s", err))
 	}
-
+	body, err = utils.Encrypt(body, cryptoKey)
+	if err != nil {
+		logger.Log.Fatal(fmt.Sprintf("Failed to encrypt metrics: %s", err))
+	}
 	client := resty.New()
 	_, err = client.R().
 		SetHeaders(map[string]string{
