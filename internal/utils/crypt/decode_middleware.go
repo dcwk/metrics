@@ -21,7 +21,7 @@ func DecodeBodyMiddleware(privateKeyPath string) func(next http.Handler) http.Ha
 				return
 			}
 
-			decodedBody, err := Decrypt(requestCopy.Bytes(), privateKeyPath)
+			decodedBody, err := DecryptWithRSA(requestCopy.Bytes(), privateKeyPath)
 			if err != nil {
 				logger.Log.Fatal(fmt.Sprintf("couldn't decrypt request body : %s", requestCopy.Bytes()))
 				return

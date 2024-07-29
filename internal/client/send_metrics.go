@@ -66,7 +66,7 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 	if err != nil {
 		logger.Log.Fatal(fmt.Sprintf("Failed to compress metrics: %s", err))
 	}
-	body, err = crypt.Encrypt(body, cryptoKey)
+	body, err = crypt.EncryptWithRSA(body, cryptoKey)
 	if err != nil {
 		logger.Log.Fatal(fmt.Sprintf("Failed to encrypt metrics: %s", err))
 	}

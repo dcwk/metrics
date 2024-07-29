@@ -58,7 +58,7 @@ func TestEncoder(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		encodedData, err := Encrypt([]byte(test.Data), test.PublicKeyPath)
+		encodedData, err := EncryptWithRSA([]byte(test.Data), test.PublicKeyPath)
 		if test.PublicPemError {
 			assert.Error(t, err)
 			assert.Nil(t, encodedData)
@@ -67,7 +67,7 @@ func TestEncoder(t *testing.T) {
 			assert.NoError(t, err)
 		}
 
-		decodedData, err := Decrypt(encodedData, test.PrivateKeyPath)
+		decodedData, err := DecryptWithRSA(encodedData, test.PrivateKeyPath)
 		if test.PrivatePemError {
 			assert.Error(t, err)
 			assert.Nil(t, decodedData)

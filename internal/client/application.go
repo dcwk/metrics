@@ -19,8 +19,8 @@ func Run(ctx context.Context, conf *config.ClientConf) error {
 		return err
 	}
 	log.Printf("Sending metrics to %s\n", conf.ServerAddr)
-	sigint := make(chan os.Signal, 1)
-	signal.Notify(sigint, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	shutdouwnSignal := make(chan os.Signal, 1)
+	signal.Notify(shutdouwnSignal, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	ctx, cancel := context.WithCancel(ctx)
 
 	wg := new(sync.WaitGroup)
@@ -28,8 +28,8 @@ func Run(ctx context.Context, conf *config.ClientConf) error {
 	agent := NewAgent(conf.PollInterval, conf.ReportInterval)
 
 	go func() {
-		sig := <-sigint
-		fmt.Printf("fired signal %v\n", sig)
+		signal := <-shutdouwnSignal
+		fmt.Printf("fired signal %v\n", signal)
 		cancel()
 	}()
 

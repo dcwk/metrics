@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"path/filepath"
 
 	"github.com/caarlos0/env"
 )
@@ -53,7 +54,8 @@ func (conf *ClientConf) loadConfigFile() error {
 		return err
 	}
 
-	data, err := os.ReadFile(currentDir + string(os.PathSeparator) + conf.ConfigPath)
+	filePath := filepath.Join(filepath.Dir(currentDir), string(os.PathSeparator), conf.ConfigPath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
