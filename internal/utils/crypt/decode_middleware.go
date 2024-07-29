@@ -16,7 +16,7 @@ func DecodeBodyMiddleware(privateKeyPath string) func(next http.Handler) http.Ha
 			var requestCopy bytes.Buffer
 
 			defer r.Body.Close()
-			if _, err := requestCopy.ReadFrom(r.Body); err != nil {
+			if _, err := io.ReadAll(r.Body); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
