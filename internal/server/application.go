@@ -23,6 +23,7 @@ import (
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/dcwk/metrics/internal/utils"
+	"github.com/dcwk/metrics/internal/utils/crypt"
 )
 
 func Run(conf *config.ServerConf) {
@@ -126,7 +127,7 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 
 		r.With(utils.GzipMiddleware).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
 		r.With(utils.GzipMiddleware).Post("/update/", h.UpdateMetricByJSON)
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
+		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
 			With(utils.GzipMiddleware).
 			With(utils.SignMiddleware(conf.HashKey)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
