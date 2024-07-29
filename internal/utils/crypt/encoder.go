@@ -1,4 +1,4 @@
-package utils
+package crypt
 
 import (
 	"crypto/rand"
@@ -8,7 +8,8 @@ import (
 	"os"
 )
 
-func Encrypt(b []byte, publicKeyPath string) ([]byte, error) {
+// EncryptWithRSA шифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
+func EncryptWithRSA(b []byte, publicKeyPath string) ([]byte, error) {
 	publicKeyPEM, err := os.ReadFile(publicKeyPath)
 	if err != nil {
 		return nil, err
@@ -28,7 +29,8 @@ func Encrypt(b []byte, publicKeyPath string) ([]byte, error) {
 	return cipherText, nil
 }
 
-func Decrypt(b []byte, privateKeyPath string) ([]byte, error) {
+// DecryptWithRSA дешифрует слайс байт с помощью алгоритма RSA приватным ключем, который загружаем по переданному пути
+func DecryptWithRSA(b []byte, privateKeyPath string) ([]byte, error) {
 	privateKeyPEM, err := os.ReadFile(privateKeyPath)
 	if err != nil {
 		return nil, err

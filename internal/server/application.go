@@ -2,9 +2,13 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -18,7 +22,9 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/storage"
-	"github.com/dcwk/metrics/internal/utils"
+	"github.com/dcwk/metrics/internal/utils/compress"
+	"github.com/dcwk/metrics/internal/utils/crypt"
+	"github.com/dcwk/metrics/internal/utils/sign"
 )
 
 func Run(conf *config.ServerConf) {
@@ -27,6 +33,9 @@ func Run(conf *config.ServerConf) {
 	}
 	var memStorage *storage.MemStorage
 	var dbStorage *storage.DatabaseStorage
+	var server http.Server
+	var sigChan = make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	if conf.DatabaseDSN == "" {
 		memStorage = storage.NewStorage()
@@ -70,13 +79,32 @@ func Run(conf *config.ServerConf) {
 
 	logger.Log.Info("Running server", zap.String("address", conf.ServerAddr))
 	if memStorage != nil {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(memStorage, conf)); err != nil {
-			panic(err)
+		server = http.Server{
+			Addr:    conf.ServerAddr,
+			Handler: Router(memStorage, conf),
 		}
 	} else {
-		if err := http.ListenAndServe(conf.ServerAddr, Router(dbStorage, conf)); err != nil {
-			panic(err)
+		server = http.Server{
+			Addr:    conf.ServerAddr,
+			Handler: Router(dbStorage, conf),
 		}
+	}
+
+	go func() {
+		sig := <-sigChan
+		fmt.Printf("fired signal: %s\n", sig)
+		timeoutContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		err := server.Shutdown(timeoutContext)
+		if err != nil {
+			fmt.Printf("Error shutting down server: %v\n", err)
+		}
+	}()
+
+	err := server.ListenAndServe()
+	if err != nil {
+		logger.Log.Fatal("HTTP server ListenAndServe: %v", zap.Error(err))
 	}
 }
 
@@ -95,20 +123,14 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", h.GetAllMetrics)
 		r.Get("/ping", h.Ping)
-		r.Get("/value/{type}/{name}", h.GetMetricByParams)
-		r.Post("/value/", h.GetMetricByJSON)
+		r.With(compress.GzipMiddleware).Get("/value/{type}/{name}", h.GetMetricByParams)
+		r.With(compress.GzipMiddleware).Post("/value/", h.GetMetricByJSON)
 
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
-			Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
-			Post("/update/", h.UpdateMetricByJSON)
-		r.With(utils.DecodeBodyMiddleware(conf.CryptoKey)).
-			With(utils.GzipMiddleware).
-			With(utils.SignMiddleware(conf.HashKey)).
+		r.With(compress.GzipMiddleware).Post("/update/{type}/{name}/{value}", h.UpdateMetricByParams)
+		r.With(compress.GzipMiddleware).Post("/update/", h.UpdateMetricByJSON)
+		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
+			With(compress.GzipMiddleware).
+			With(sign.SignMiddleware(conf.HashKey)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 

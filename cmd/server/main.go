@@ -6,7 +6,7 @@ import (
 
 	"github.com/dcwk/metrics/internal/config"
 	"github.com/dcwk/metrics/internal/server"
-	"github.com/dcwk/metrics/internal/utils"
+	"github.com/dcwk/metrics/internal/utils/info"
 )
 
 var buildVersion string
@@ -19,6 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	utils.BuildInfo(buildVersion, buildDate, buildCommit)
+	info.BuildInfo(buildVersion, buildDate, buildCommit)
 	server.Run(conf)
 }

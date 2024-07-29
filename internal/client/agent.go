@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/rand"
 	"runtime"
@@ -27,9 +28,11 @@ func NewAgent(pollInterval int64, reportInterval int64) *Agent {
 func (a *Agent) pollMetrics(ctx context.Context, wg *sync.WaitGroup) {
 	pollTicker := time.NewTicker(time.Duration(a.PollInterval) * time.Second)
 	defer pollTicker.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
+			fmt.Printf("stopped polling metrics")
 			wg.Done()
 			return
 		case <-pollTicker.C:

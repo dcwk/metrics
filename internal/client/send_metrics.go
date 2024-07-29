@@ -14,7 +14,7 @@ import (
 
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
-	"github.com/dcwk/metrics/internal/utils"
+	"github.com/dcwk/metrics/internal/utils/crypt"
 )
 
 func SendMetrics(metrics map[string]float64, addr string, hashKey string, cryptoKey string, pollCount *int64) error {
@@ -66,7 +66,7 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 	if err != nil {
 		logger.Log.Fatal(fmt.Sprintf("Failed to compress metrics: %s", err))
 	}
-	body, err = utils.Encrypt(body, cryptoKey)
+	body, err = crypt.EncryptWithRSA(body, cryptoKey)
 	if err != nil {
 		logger.Log.Fatal(fmt.Sprintf("Failed to encrypt metrics: %s", err))
 	}
