@@ -21,6 +21,7 @@ type ServerConf struct {
 	IsActivePprof   bool   `env:"IS_ACTIVE_PPROF" envDefault:"false"`
 	CryptoKey       string `env:"CRYPTO_KEY" json:"crypto_key"`
 	ConfigPath      string `env:"CONFIG"`
+	TrustedSubnet   string `env:"TRUSTED_SUBNET" json:"trusted_subnet"`
 }
 
 func NewServerConf() (*ServerConf, error) {
@@ -40,6 +41,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
 	flag.BoolVar(&conf.IsActivePprof, "p", false, "enable pprof")
 	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/keys/private.pem", "path to private key")
+	flag.StringVar(&conf.TrustedSubnet, "t", "", "trusted subnet")
 	flag.Parse()
 
 	err = env.Parse(conf)
