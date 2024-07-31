@@ -77,6 +77,7 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 			"Accept-Encoding":  "gzip",
 			"Content-Encoding": "gzip",
 			"HashSHA256":       hex.EncodeToString(sign),
+			"X-Real-IP":        "127.0.0.1",
 		}).
 		SetBody(string(body)).
 		Post(path)

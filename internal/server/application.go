@@ -24,6 +24,7 @@ import (
 	"github.com/dcwk/metrics/internal/storage"
 	"github.com/dcwk/metrics/internal/utils/compress"
 	"github.com/dcwk/metrics/internal/utils/crypt"
+	"github.com/dcwk/metrics/internal/utils/realip"
 	"github.com/dcwk/metrics/internal/utils/sign"
 )
 
@@ -131,6 +132,7 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
 			With(compress.GzipMiddleware).
 			With(sign.SignMiddleware(conf.HashKey)).
+			With(realip.CheckXRealIpMiddleware(conf.TrustedSubnet)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 
