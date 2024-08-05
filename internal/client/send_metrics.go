@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -11,7 +12,10 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mailru/easyjson"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/dcwk/metrics/internal/grpchandler"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
 	"github.com/dcwk/metrics/internal/utils/crypt"
@@ -77,6 +81,7 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 			"Accept-Encoding":  "gzip",
 			"Content-Encoding": "gzip",
 			"HashSHA256":       hex.EncodeToString(sign),
+			"X-Real-IP":        "127.0.0.1",
 		}).
 		SetBody(string(body)).
 		Post(path)
@@ -84,6 +89,29 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 		logger.Log.Error(fmt.Sprintf("Can't send request to server: %s", err.Error()))
 		return err
 	}
+
+	return nil
+}
+
+func sendMetricsByGRPC(metricsJSON []byte, grpcServerAddr string) error {
+	conn, err := grpc.NewClient(grpcServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	c := grpchandler.NewMetricsServiceClient(conn)
+
+	respUpdate, err := c.UpdateBatchMetricByJSON(
+		context.Background(),
+		&grpchandler.UpdateBatchMetricByJSONRequest{
+			Metrics: string(metricsJSON),
+		},
+	)
+	if err != nil {
+		return err
+	}
+	logger.Log.Info(fmt.Sprintf("success update metrics data: %s", respUpdate))
 
 	return nil
 }

@@ -12,6 +12,7 @@ import (
 
 type ServerConf struct {
 	ServerAddr      string `env:"ADDRESS" json:"address"`
+	GRPCServerAddr  string `env:"GRPC_ADDRESS" json:"grpc_address"`
 	LogLevel        string `env:"LOG_LEVEL"`
 	StoreInterval   int64  `env:"STORE_INTERVAL" json:"store_interval"`
 	FileStoragePath string `env:"FILE_STORAGE_PATH" json:"store_file"`
@@ -21,17 +22,19 @@ type ServerConf struct {
 	IsActivePprof   bool   `env:"IS_ACTIVE_PPROF" envDefault:"false"`
 	CryptoKey       string `env:"CRYPTO_KEY" json:"crypto_key"`
 	ConfigPath      string `env:"CONFIG"`
+	TrustedSubnet   string `env:"TRUSTED_SUBNET" json:"trusted_subnet"`
 }
 
 func NewServerConf() (*ServerConf, error) {
 	conf := &ServerConf{}
-	flag.StringVar(&conf.ConfigPath, "c", "../../internal/config/server_config.json", "Path to json config file")
+	flag.StringVar(&conf.ConfigPath, "c", "../internal/config/server_config.json", "Path to json config file")
 	err := conf.loadConfigFile()
 	if err != nil {
 		return nil, err
 	}
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "address and port to run server")
+	flag.StringVar(&conf.GRPCServerAddr, "gs", "localhost:3200", "address and port to run grpc server")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
 	flag.StringVar(&conf.DatabaseDSN, "d", "", "setup database dsn connection settings")
 	flag.Int64Var(&conf.StoreInterval, "i", 300, "store interval")
@@ -40,6 +43,7 @@ func NewServerConf() (*ServerConf, error) {
 	flag.StringVar(&conf.HashKey, "k", "test", "hash key for check request")
 	flag.BoolVar(&conf.IsActivePprof, "p", false, "enable pprof")
 	flag.StringVar(&conf.CryptoKey, "crypto-key", "/Users/ruslan.golovizin/Projects/practicum/keys/private.pem", "path to private key")
+	flag.StringVar(&conf.TrustedSubnet, "t", "", "trusted subnet")
 	flag.Parse()
 
 	err = env.Parse(conf)
