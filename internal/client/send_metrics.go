@@ -94,19 +94,13 @@ func send(metricsJSON []byte, path string, hashKey string, cryptoKey string) err
 }
 
 func sendMetricsByGRPC(metricsJSON []byte, grpcServerAddr string) error {
-	conn, err := grpc.Dial(grpcServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(grpcServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
 	c := grpchandler.NewMetricsServiceClient(conn)
-
-	respPing, err := c.Ping(context.Background(), &grpchandler.PingRequest{})
-	if err != nil {
-		return err
-	}
-	logger.Log.Info(fmt.Sprintf("success ping: %s", respPing))
 
 	respUpdate, err := c.UpdateBatchMetricByJSON(
 		context.Background(),
