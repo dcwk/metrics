@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.27.1
-// source: metrics.proto
+// source: proto/metrics.proto
 
 package grpchandler
 
@@ -20,8 +20,6 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MetricsService_GetAllMetrics_FullMethodName           = "/metrics.MetricsService/GetAllMetrics"
-	MetricsService_GetMetricByJSON_FullMethodName         = "/metrics.MetricsService/GetMetricByJSON"
 	MetricsService_UpdateBatchMetricByJSON_FullMethodName = "/metrics.MetricsService/UpdateBatchMetricByJSON"
 	MetricsService_Ping_FullMethodName                    = "/metrics.MetricsService/Ping"
 )
@@ -30,8 +28,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MetricsServiceClient interface {
-	GetAllMetrics(ctx context.Context, in *GetAllMetricsRequest, opts ...grpc.CallOption) (*GetAllMetricsResponse, error)
-	GetMetricByJSON(ctx context.Context, in *GetMetricByJSONRequest, opts ...grpc.CallOption) (*GetMetricByJSONResponse, error)
 	UpdateBatchMetricByJSON(ctx context.Context, in *UpdateBatchMetricByJSONRequest, opts ...grpc.CallOption) (*UpdateBatchMetricByJSONResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 }
@@ -42,26 +38,6 @@ type metricsServiceClient struct {
 
 func NewMetricsServiceClient(cc grpc.ClientConnInterface) MetricsServiceClient {
 	return &metricsServiceClient{cc}
-}
-
-func (c *metricsServiceClient) GetAllMetrics(ctx context.Context, in *GetAllMetricsRequest, opts ...grpc.CallOption) (*GetAllMetricsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAllMetricsResponse)
-	err := c.cc.Invoke(ctx, MetricsService_GetAllMetrics_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *metricsServiceClient) GetMetricByJSON(ctx context.Context, in *GetMetricByJSONRequest, opts ...grpc.CallOption) (*GetMetricByJSONResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetMetricByJSONResponse)
-	err := c.cc.Invoke(ctx, MetricsService_GetMetricByJSON_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *metricsServiceClient) UpdateBatchMetricByJSON(ctx context.Context, in *UpdateBatchMetricByJSONRequest, opts ...grpc.CallOption) (*UpdateBatchMetricByJSONResponse, error) {
@@ -88,8 +64,6 @@ func (c *metricsServiceClient) Ping(ctx context.Context, in *PingRequest, opts .
 // All implementations must embed UnimplementedMetricsServiceServer
 // for forward compatibility.
 type MetricsServiceServer interface {
-	GetAllMetrics(context.Context, *GetAllMetricsRequest) (*GetAllMetricsResponse, error)
-	GetMetricByJSON(context.Context, *GetMetricByJSONRequest) (*GetMetricByJSONResponse, error)
 	UpdateBatchMetricByJSON(context.Context, *UpdateBatchMetricByJSONRequest) (*UpdateBatchMetricByJSONResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	mustEmbedUnimplementedMetricsServiceServer()
@@ -102,12 +76,6 @@ type MetricsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMetricsServiceServer struct{}
 
-func (UnimplementedMetricsServiceServer) GetAllMetrics(context.Context, *GetAllMetricsRequest) (*GetAllMetricsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllMetrics not implemented")
-}
-func (UnimplementedMetricsServiceServer) GetMetricByJSON(context.Context, *GetMetricByJSONRequest) (*GetMetricByJSONResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMetricByJSON not implemented")
-}
 func (UnimplementedMetricsServiceServer) UpdateBatchMetricByJSON(context.Context, *UpdateBatchMetricByJSONRequest) (*UpdateBatchMetricByJSONResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBatchMetricByJSON not implemented")
 }
@@ -133,42 +101,6 @@ func RegisterMetricsServiceServer(s grpc.ServiceRegistrar, srv MetricsServiceSer
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&MetricsService_ServiceDesc, srv)
-}
-
-func _MetricsService_GetAllMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllMetricsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MetricsServiceServer).GetAllMetrics(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MetricsService_GetAllMetrics_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetricsServiceServer).GetAllMetrics(ctx, req.(*GetAllMetricsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MetricsService_GetMetricByJSON_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMetricByJSONRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MetricsServiceServer).GetMetricByJSON(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MetricsService_GetMetricByJSON_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetricsServiceServer).GetMetricByJSON(ctx, req.(*GetMetricByJSONRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _MetricsService_UpdateBatchMetricByJSON_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -215,14 +147,6 @@ var MetricsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MetricsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetAllMetrics",
-			Handler:    _MetricsService_GetAllMetrics_Handler,
-		},
-		{
-			MethodName: "GetMetricByJSON",
-			Handler:    _MetricsService_GetMetricByJSON_Handler,
-		},
-		{
 			MethodName: "UpdateBatchMetricByJSON",
 			Handler:    _MetricsService_UpdateBatchMetricByJSON_Handler,
 		},
@@ -232,5 +156,5 @@ var MetricsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "metrics.proto",
+	Metadata: "proto/metrics.proto",
 }

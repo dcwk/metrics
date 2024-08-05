@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.34.2
 // 	protoc        v5.27.1
-// source: metrics.proto
+// source: proto/metrics.proto
 
 package grpchandler
 
@@ -21,168 +21,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GetAllMetricsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetAllMetricsRequest) Reset() {
-	*x = GetAllMetricsRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAllMetricsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAllMetricsRequest) ProtoMessage() {}
-
-func (x *GetAllMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAllMetricsRequest.ProtoReflect.Descriptor instead.
-func (*GetAllMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{0}
-}
-
-type GetAllMetricsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetAllMetricsResponse) Reset() {
-	*x = GetAllMetricsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAllMetricsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAllMetricsResponse) ProtoMessage() {}
-
-func (x *GetAllMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAllMetricsResponse.ProtoReflect.Descriptor instead.
-func (*GetAllMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{1}
-}
-
-type GetMetricByJSONRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetMetricByJSONRequest) Reset() {
-	*x = GetMetricByJSONRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetMetricByJSONRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMetricByJSONRequest) ProtoMessage() {}
-
-func (x *GetMetricByJSONRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMetricByJSONRequest.ProtoReflect.Descriptor instead.
-func (*GetMetricByJSONRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{2}
-}
-
-type GetMetricByJSONResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetMetricByJSONResponse) Reset() {
-	*x = GetMetricByJSONResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetMetricByJSONResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMetricByJSONResponse) ProtoMessage() {}
-
-func (x *GetMetricByJSONResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMetricByJSONResponse.ProtoReflect.Descriptor instead.
-func (*GetMetricByJSONResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{3}
-}
-
 type UpdateBatchMetricByJSONRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Metrics string `protobuf:"bytes,1,opt,name=Metrics,proto3" json:"Metrics,omitempty"`
 }
 
 func (x *UpdateBatchMetricByJSONRequest) Reset() {
 	*x = UpdateBatchMetricByJSONRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[4]
+		mi := &file_proto_metrics_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -195,7 +45,7 @@ func (x *UpdateBatchMetricByJSONRequest) String() string {
 func (*UpdateBatchMetricByJSONRequest) ProtoMessage() {}
 
 func (x *UpdateBatchMetricByJSONRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[4]
+	mi := &file_proto_metrics_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -208,7 +58,14 @@ func (x *UpdateBatchMetricByJSONRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateBatchMetricByJSONRequest.ProtoReflect.Descriptor instead.
 func (*UpdateBatchMetricByJSONRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{4}
+	return file_proto_metrics_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UpdateBatchMetricByJSONRequest) GetMetrics() string {
+	if x != nil {
+		return x.Metrics
+	}
+	return ""
 }
 
 type UpdateBatchMetricByJSONResponse struct {
@@ -220,7 +77,7 @@ type UpdateBatchMetricByJSONResponse struct {
 func (x *UpdateBatchMetricByJSONResponse) Reset() {
 	*x = UpdateBatchMetricByJSONResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[5]
+		mi := &file_proto_metrics_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -233,7 +90,7 @@ func (x *UpdateBatchMetricByJSONResponse) String() string {
 func (*UpdateBatchMetricByJSONResponse) ProtoMessage() {}
 
 func (x *UpdateBatchMetricByJSONResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[5]
+	mi := &file_proto_metrics_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -246,7 +103,7 @@ func (x *UpdateBatchMetricByJSONResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateBatchMetricByJSONResponse.ProtoReflect.Descriptor instead.
 func (*UpdateBatchMetricByJSONResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{5}
+	return file_proto_metrics_proto_rawDescGZIP(), []int{1}
 }
 
 type PingRequest struct {
@@ -258,7 +115,7 @@ type PingRequest struct {
 func (x *PingRequest) Reset() {
 	*x = PingRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[6]
+		mi := &file_proto_metrics_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -271,7 +128,7 @@ func (x *PingRequest) String() string {
 func (*PingRequest) ProtoMessage() {}
 
 func (x *PingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[6]
+	mi := &file_proto_metrics_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -284,7 +141,7 @@ func (x *PingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
 func (*PingRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{6}
+	return file_proto_metrics_proto_rawDescGZIP(), []int{2}
 }
 
 type PingResponse struct {
@@ -296,7 +153,7 @@ type PingResponse struct {
 func (x *PingResponse) Reset() {
 	*x = PingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[7]
+		mi := &file_proto_metrics_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -309,7 +166,7 @@ func (x *PingResponse) String() string {
 func (*PingResponse) ProtoMessage() {}
 
 func (x *PingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[7]
+	mi := &file_proto_metrics_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,146 +179,76 @@ func (x *PingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
 func (*PingResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{7}
+	return file_proto_metrics_proto_rawDescGZIP(), []int{3}
 }
 
-var File_metrics_proto protoreflect.FileDescriptor
+var File_proto_metrics_proto protoreflect.FileDescriptor
 
-var file_metrics_proto_rawDesc = []byte{
-	0x0a, 0x0d, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
-	0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0x16, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x41,
-	0x6c, 0x6c, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x22, 0x17, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x18, 0x0a, 0x16, 0x47, 0x65, 0x74,
-	0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x22, 0x19, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63,
-	0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x20,
+var file_proto_metrics_proto_rawDesc = []byte{
+	0x0a, 0x13, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0x3a,
 	0x0a, 0x1e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74,
 	0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x22, 0x21, 0x0a, 0x1f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d,
-	0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x0d, 0x0a, 0x0b, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x22, 0x0e, 0x0a, 0x0c, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x32, 0xd9, 0x02, 0x0a, 0x0e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x53, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4e, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4d,
-	0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x1d, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73,
-	0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e,
-	0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72,
-	0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x12, 0x1f, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69,
-	0x63, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53,
-	0x4f, 0x4e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x6d, 0x65, 0x74, 0x72,
-	0x69, 0x63, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a,
-	0x53, 0x4f, 0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6c, 0x0a, 0x17, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63,
-	0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x12, 0x27, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73,
-	0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74, 0x72,
-	0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x28, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f,
-	0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x33, 0x0a, 0x04, 0x50, 0x69, 0x6e,
-	0x67, 0x12, 0x14, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e, 0x50, 0x69, 0x6e, 0x67,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63,
-	0x73, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x18,
-	0x5a, 0x16, 0x2e, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x67, 0x72, 0x70,
-	0x63, 0x68, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0x18, 0x0a, 0x07, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0x21, 0x0a, 0x1f, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42,
+	0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x0d, 0x0a,
+	0x0b, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x0e, 0x0a, 0x0c,
+	0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb3, 0x01, 0x0a,
+	0x0e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
+	0x6c, 0x0a, 0x17, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65,
+	0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x12, 0x27, 0x2e, 0x6d, 0x65, 0x74,
+	0x72, 0x69, 0x63, 0x73, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68,
+	0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42, 0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x42,
+	0x79, 0x4a, 0x53, 0x4f, 0x4e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x33, 0x0a,
+	0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x14, 0x2e, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2e,
+	0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x6d, 0x65,
+	0x74, 0x72, 0x69, 0x63, 0x73, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x42, 0x1e, 0x5a, 0x1c, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2f, 0x69, 0x6e,
+	0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x68, 0x61, 0x6e, 0x64, 0x6c,
+	0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_metrics_proto_rawDescOnce sync.Once
-	file_metrics_proto_rawDescData = file_metrics_proto_rawDesc
+	file_proto_metrics_proto_rawDescOnce sync.Once
+	file_proto_metrics_proto_rawDescData = file_proto_metrics_proto_rawDesc
 )
 
-func file_metrics_proto_rawDescGZIP() []byte {
-	file_metrics_proto_rawDescOnce.Do(func() {
-		file_metrics_proto_rawDescData = protoimpl.X.CompressGZIP(file_metrics_proto_rawDescData)
+func file_proto_metrics_proto_rawDescGZIP() []byte {
+	file_proto_metrics_proto_rawDescOnce.Do(func() {
+		file_proto_metrics_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_metrics_proto_rawDescData)
 	})
-	return file_metrics_proto_rawDescData
+	return file_proto_metrics_proto_rawDescData
 }
 
-var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_metrics_proto_goTypes = []any{
-	(*GetAllMetricsRequest)(nil),            // 0: metrics.GetAllMetricsRequest
-	(*GetAllMetricsResponse)(nil),           // 1: metrics.GetAllMetricsResponse
-	(*GetMetricByJSONRequest)(nil),          // 2: metrics.GetMetricByJSONRequest
-	(*GetMetricByJSONResponse)(nil),         // 3: metrics.GetMetricByJSONResponse
-	(*UpdateBatchMetricByJSONRequest)(nil),  // 4: metrics.UpdateBatchMetricByJSONRequest
-	(*UpdateBatchMetricByJSONResponse)(nil), // 5: metrics.UpdateBatchMetricByJSONResponse
-	(*PingRequest)(nil),                     // 6: metrics.PingRequest
-	(*PingResponse)(nil),                    // 7: metrics.PingResponse
+var file_proto_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_metrics_proto_goTypes = []any{
+	(*UpdateBatchMetricByJSONRequest)(nil),  // 0: metrics.UpdateBatchMetricByJSONRequest
+	(*UpdateBatchMetricByJSONResponse)(nil), // 1: metrics.UpdateBatchMetricByJSONResponse
+	(*PingRequest)(nil),                     // 2: metrics.PingRequest
+	(*PingResponse)(nil),                    // 3: metrics.PingResponse
 }
-var file_metrics_proto_depIdxs = []int32{
-	0, // 0: metrics.MetricsService.GetAllMetrics:input_type -> metrics.GetAllMetricsRequest
-	2, // 1: metrics.MetricsService.GetMetricByJSON:input_type -> metrics.GetMetricByJSONRequest
-	4, // 2: metrics.MetricsService.UpdateBatchMetricByJSON:input_type -> metrics.UpdateBatchMetricByJSONRequest
-	6, // 3: metrics.MetricsService.Ping:input_type -> metrics.PingRequest
-	1, // 4: metrics.MetricsService.GetAllMetrics:output_type -> metrics.GetAllMetricsResponse
-	3, // 5: metrics.MetricsService.GetMetricByJSON:output_type -> metrics.GetMetricByJSONResponse
-	5, // 6: metrics.MetricsService.UpdateBatchMetricByJSON:output_type -> metrics.UpdateBatchMetricByJSONResponse
-	7, // 7: metrics.MetricsService.Ping:output_type -> metrics.PingResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+var file_proto_metrics_proto_depIdxs = []int32{
+	0, // 0: metrics.MetricsService.UpdateBatchMetricByJSON:input_type -> metrics.UpdateBatchMetricByJSONRequest
+	2, // 1: metrics.MetricsService.Ping:input_type -> metrics.PingRequest
+	1, // 2: metrics.MetricsService.UpdateBatchMetricByJSON:output_type -> metrics.UpdateBatchMetricByJSONResponse
+	3, // 3: metrics.MetricsService.Ping:output_type -> metrics.PingResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_metrics_proto_init() }
-func file_metrics_proto_init() {
-	if File_metrics_proto != nil {
+func init() { file_proto_metrics_proto_init() }
+func file_proto_metrics_proto_init() {
+	if File_proto_metrics_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_metrics_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*GetAllMetricsRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_metrics_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*GetAllMetricsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_metrics_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*GetMetricByJSONRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_metrics_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetMetricByJSONResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_metrics_proto_msgTypes[4].Exporter = func(v any, i int) any {
+		file_proto_metrics_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*UpdateBatchMetricByJSONRequest); i {
 			case 0:
 				return &v.state
@@ -473,7 +260,7 @@ func file_metrics_proto_init() {
 				return nil
 			}
 		}
-		file_metrics_proto_msgTypes[5].Exporter = func(v any, i int) any {
+		file_proto_metrics_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*UpdateBatchMetricByJSONResponse); i {
 			case 0:
 				return &v.state
@@ -485,7 +272,7 @@ func file_metrics_proto_init() {
 				return nil
 			}
 		}
-		file_metrics_proto_msgTypes[6].Exporter = func(v any, i int) any {
+		file_proto_metrics_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*PingRequest); i {
 			case 0:
 				return &v.state
@@ -497,7 +284,7 @@ func file_metrics_proto_init() {
 				return nil
 			}
 		}
-		file_metrics_proto_msgTypes[7].Exporter = func(v any, i int) any {
+		file_proto_metrics_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*PingResponse); i {
 			case 0:
 				return &v.state
@@ -514,18 +301,18 @@ func file_metrics_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_metrics_proto_rawDesc,
+			RawDescriptor: file_proto_metrics_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_metrics_proto_goTypes,
-		DependencyIndexes: file_metrics_proto_depIdxs,
-		MessageInfos:      file_metrics_proto_msgTypes,
+		GoTypes:           file_proto_metrics_proto_goTypes,
+		DependencyIndexes: file_proto_metrics_proto_depIdxs,
+		MessageInfos:      file_proto_metrics_proto_msgTypes,
 	}.Build()
-	File_metrics_proto = out.File
-	file_metrics_proto_rawDesc = nil
-	file_metrics_proto_goTypes = nil
-	file_metrics_proto_depIdxs = nil
+	File_proto_metrics_proto = out.File
+	file_proto_metrics_proto_rawDesc = nil
+	file_proto_metrics_proto_goTypes = nil
+	file_proto_metrics_proto_depIdxs = nil
 }

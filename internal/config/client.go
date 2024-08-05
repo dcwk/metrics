@@ -12,6 +12,7 @@ import (
 
 type ClientConf struct {
 	ServerAddr     string `env:"ADDRESS" json:"address"`
+	GRPCServerAddr string `env:"GRPC_SERVER_ADDR" json:"grpc_server_addr"`
 	ReportInterval int64  `env:"REPORT_INTERVAL" json:"report_interval"`
 	PollInterval   int64  `env:"POLL_INTERVAL" json:"poll_interval"`
 	LogLevel       string `env:"LOG_LEVEL"`
@@ -29,6 +30,7 @@ func NewClientConf() (*ClientConf, error) {
 	}
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "metrics server address")
+	flag.StringVar(&conf.GRPCServerAddr, "gs", "localhost:3200", "grpc metrics server address")
 	flag.Int64Var(&conf.ReportInterval, "r", 10, "sending frequency interval")
 	flag.Int64Var(&conf.PollInterval, "p", 2, "metrics reading frequency")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")

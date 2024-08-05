@@ -96,7 +96,7 @@ func Run(conf *config.ServerConf) {
 	}
 
 	go func() {
-		listen, err := net.Listen("tcp", ":3200")
+		listen, err := net.Listen("tcp", conf.GRPCServerAddr)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -117,7 +117,7 @@ func Run(conf *config.ServerConf) {
 			grpchandler.RegisterMetricsServiceServer(s, grpcServer)
 		}
 
-		fmt.Println("Сервер gRPC начал работу")
+		logger.Log.Info(fmt.Sprintf("gRPC server started at %s...", conf.GRPCServerAddr))
 		if err := s.Serve(listen); err != nil {
 			log.Fatal(err)
 		}

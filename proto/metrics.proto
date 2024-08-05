@@ -5,21 +5,13 @@ package metrics;
 option go_package = "metrics/internal/grpchandler";
 
 service MetricsService {
-  rpc GetAllMetrics(GetAllMetricsRequest) returns (GetAllMetricsResponse);
-  rpc GetMetricByJSON(GetMetricByJSONRequest) returns (GetMetricByJSONResponse);
   rpc UpdateBatchMetricByJSON(UpdateBatchMetricByJSONRequest) returns (UpdateBatchMetricByJSONResponse);
   rpc Ping(PingRequest) returns (PingResponse);
 }
 
-message GetAllMetricsRequest {}
-
-message GetAllMetricsResponse {}
-
-message GetMetricByJSONRequest {}
-
-message GetMetricByJSONResponse {}
-
-message UpdateBatchMetricByJSONRequest {}
+message UpdateBatchMetricByJSONRequest {
+  string Metrics = 1;
+}
 
 message UpdateBatchMetricByJSONResponse {}
 
