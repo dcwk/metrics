@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,8 +18,10 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mailru/easyjson"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	"github.com/dcwk/metrics/internal/config"
+	"github.com/dcwk/metrics/internal/grpchandler"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
@@ -90,6 +94,34 @@ func Run(conf *config.ServerConf) {
 			Handler: Router(dbStorage, conf),
 		}
 	}
+
+	go func() {
+		listen, err := net.Listen("tcp", ":3200")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		s := grpc.NewServer()
+		if memStorage != nil {
+			grpcServer := &grpchandler.MetricsServer{
+				Storage: memStorage,
+				Conf:    conf,
+			}
+			grpchandler.RegisterMetricsServiceServer(s, grpcServer)
+
+		} else {
+			grpcServer := &grpchandler.MetricsServer{
+				Storage: dbStorage,
+				Conf:    conf,
+			}
+			grpchandler.RegisterMetricsServiceServer(s, grpcServer)
+		}
+
+		fmt.Println("Сервер gRPC начал работу")
+		if err := s.Serve(listen); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	go func() {
 		sig := <-sigChan

@@ -26,7 +26,7 @@ type ServerConf struct {
 
 func NewServerConf() (*ServerConf, error) {
 	conf := &ServerConf{}
-	flag.StringVar(&conf.ConfigPath, "c", "internal/config/server_config.json", "Path to json config file")
+	flag.StringVar(&conf.ConfigPath, "c", "../../internal/config/server_config.json", "Path to json config file")
 	err := conf.loadConfigFile()
 	if err != nil {
 		return nil, err
