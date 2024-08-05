@@ -132,7 +132,7 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
 			With(compress.GzipMiddleware).
 			With(sign.SignMiddleware(conf.HashKey)).
-			With(realip.CheckXRealIpMiddleware(conf.TrustedSubnet)).
+			With(realip.CheckXRealIPMiddleware(conf.TrustedSubnet)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 

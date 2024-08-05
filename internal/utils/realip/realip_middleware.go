@@ -8,9 +8,9 @@ import (
 	"github.com/dcwk/metrics/internal/logger"
 )
 
-// CheckXRealIpMiddleware checks the ip in the X-Real-IP http header
+// CheckXRealIPMiddleware checks the ip in the X-Real-IP http header
 // whether it is part of a trusted network
-func CheckXRealIpMiddleware(trustedNetwork string) func(next http.Handler) http.Handler {
+func CheckXRealIPMiddleware(trustedNetwork string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if trustedNetwork == "" {
