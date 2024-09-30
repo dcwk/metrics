@@ -12,6 +12,7 @@ import (
 
 type ServerConf struct {
 	ServerAddr      string `env:"ADDRESS" json:"address"`
+	GRPCServerAddr  string `env:"GRPC_ADDRESS" json:"grpc_address"`
 	LogLevel        string `env:"LOG_LEVEL"`
 	StoreInterval   int64  `env:"STORE_INTERVAL" json:"store_interval"`
 	FileStoragePath string `env:"FILE_STORAGE_PATH" json:"store_file"`
@@ -26,13 +27,14 @@ type ServerConf struct {
 
 func NewServerConf() (*ServerConf, error) {
 	conf := &ServerConf{}
-	flag.StringVar(&conf.ConfigPath, "c", "internal/config/server_config.json", "Path to json config file")
+	flag.StringVar(&conf.ConfigPath, "c", "../internal/config/server_config.json", "Path to json config file")
 	err := conf.loadConfigFile()
 	if err != nil {
 		return nil, err
 	}
 
 	flag.StringVar(&conf.ServerAddr, "a", "localhost:8080", "address and port to run server")
+	flag.StringVar(&conf.GRPCServerAddr, "gs", "localhost:3200", "address and port to run grpc server")
 	flag.StringVar(&conf.LogLevel, "l", "info", "log level")
 	flag.StringVar(&conf.DatabaseDSN, "d", "", "setup database dsn connection settings")
 	flag.Int64Var(&conf.StoreInterval, "i", 300, "store interval")

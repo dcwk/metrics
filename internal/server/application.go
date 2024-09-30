@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,8 +18,10 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mailru/easyjson"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	"github.com/dcwk/metrics/internal/config"
+	"github.com/dcwk/metrics/internal/grpchandler"
 	"github.com/dcwk/metrics/internal/handlers"
 	"github.com/dcwk/metrics/internal/logger"
 	"github.com/dcwk/metrics/internal/models"
@@ -92,6 +96,34 @@ func Run(conf *config.ServerConf) {
 	}
 
 	go func() {
+		listen, err := net.Listen("tcp", conf.GRPCServerAddr)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		s := grpc.NewServer()
+		if memStorage != nil {
+			grpcServer := &grpchandler.MetricsServer{
+				Storage: memStorage,
+				Conf:    conf,
+			}
+			grpchandler.RegisterMetricsServiceServer(s, grpcServer)
+
+		} else {
+			grpcServer := &grpchandler.MetricsServer{
+				Storage: dbStorage,
+				Conf:    conf,
+			}
+			grpchandler.RegisterMetricsServiceServer(s, grpcServer)
+		}
+
+		logger.Log.Info(fmt.Sprintf("gRPC server started at %s...", conf.GRPCServerAddr))
+		if err := s.Serve(listen); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	go func() {
 		sig := <-sigChan
 		fmt.Printf("fired signal: %s\n", sig)
 		timeoutContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -132,7 +164,7 @@ func Router(storage storage.DataKeeper, conf *config.ServerConf) chi.Router {
 		r.With(crypt.DecodeBodyMiddleware(conf.CryptoKey)).
 			With(compress.GzipMiddleware).
 			With(sign.SignMiddleware(conf.HashKey)).
-			With(realip.CheckXRealIpMiddleware(conf.TrustedSubnet)).
+			With(realip.CheckXRealIPMiddleware(conf.TrustedSubnet)).
 			Post("/updates/", h.UpdateBatchMetricByJSON)
 	})
 
